@@ -1,11 +1,10 @@
 <?php
 
-namespace EscolaLms\Payments\Repository\TransactionRegistration;
+namespace EscolaLms\Payments\Repository;
 
 use EscolaLms\Payments\Models\TransactionRegistration;
+use \Stripe\StripeClient;
 
 class TransactionRegistrationRepository
 {
-    public function createUsingModel(TransactionRegistration $model): TransactionRegistration {
-    }
 }
