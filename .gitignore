@@ -5,3 +5,4 @@ tags
 src/oa_version.php
 phpunit.xml
 testbench.yaml
+.env
