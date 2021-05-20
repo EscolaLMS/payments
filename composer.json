@@ -24,6 +24,7 @@
         "psr-4": {
             "EscolaLms\\Payments\\": "src",
             "EscolaLms\\Payments\\Database\\Seeders\\": "database/seeders",
+            "EscolaLms\\Payments\\Database\\Migrations\\": "database/migrations",
             "Database\\Factories\\EscolaLms\\Payments\\Models\\": "database/factories",
             "EscolaLms\\Payments\\Tests\\": "tests"
         }

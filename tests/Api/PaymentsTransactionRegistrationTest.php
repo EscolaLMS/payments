@@ -10,7 +10,11 @@ class PaymentsTransactionRegistrationTest extends \EscolaLms\Payments\Tests\Test
 
     public function testStudentCanRegisterPayment() {
         $this->response = $this->actingAs($this->makeStudent())
-            ->json('POST', '/api/payments/transaction', [])
+            ->json(
+                'POST',
+                '/api/payments/transaction',
+                ['amount'=>15,'currency'=>'PLN','description'=>'Payment for the course XYZ']
+            )
         ;
         $this->response->assertOk();
         //@todo login as student
