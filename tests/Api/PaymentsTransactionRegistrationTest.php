@@ -16,7 +16,7 @@ class PaymentsTransactionRegistrationTest extends \EscolaLms\Payments\Tests\Test
 
         $this->response = $this->actingAs($user)
             ->json(
-                'POST',
+                'PUT',
                 '/api/payments/transaction',
                 [
                     'amount'=>$registration->amount,
