@@ -18,6 +18,10 @@ interface PaymentsApiContract
      *         description="Request body varies upon registered provider",
      *         required=true,
      *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Response varies upon registered provider",
+     *      ),
      * )
      * @param GatewayRequest $request
      * @return JsonResponse
@@ -32,6 +36,27 @@ interface PaymentsApiContract
      *         required=true,
      *         @OA\JsonContent(ref="#/components/schemas/TransactionRegistrationRequest")
      *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Transaction had been registered successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/TransactionRegistration")
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="endpoint requires authentication",
+     *     ),
+     *     @OA\Response(
+     *          response=403,
+     *          description="user doesn't have required access rights",
+     *      ),
+     *     @OA\Response(
+     *          response=422,
+     *          description="one of the parameters has invalid format",
+     *      ),
+     *     @OA\Response(
+     *          response=500,
+     *          description="server-side error",
+     *      ),
      * )
      * @param TransactionRegistrationRequest $request
      * @return JsonResponse

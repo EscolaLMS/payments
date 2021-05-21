@@ -6,10 +6,25 @@ use Illuminate\Foundation\Http\FormRequest;
 use Alcohol\ISO4217;
 
 /**
- * @OA/Schema(
- *  schema="TransactionRegistrationRequest",
- *  @OA\Property(
- *  )
+ * @OA\Schema(
+ *     schema="TransactionRegistrationRequest",
+ *     required={"amount","currency"},
+ *     @OA\Property(
+ *          property="amount",
+ *          type="integer",
+ *          description="amount of currency to charge"
+ *     ),
+ *     @OA\Property(
+ *          property="currency",
+ *          type="string",
+ *          description="Currency code defined as alpha 3 in ISO 4217"
+ *     ),
+ *     @OA\Property(
+ *         property="description",
+ *         type="string",
+ *         maxLength=255,
+ *         description="short description text that will show up in payment dialog"
+ *     ),
  * )
  */
 class TransactionRegistrationRequest extends FormRequest

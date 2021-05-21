@@ -23,11 +23,11 @@ class PaymentsApiController extends EscolaLmsBaseController implements PaymentsA
     }
 
     public function registerTransaction(TransactionRegistrationRequest $request): JsonResponse {
-        $transaction = $this->service->registerTransaction(
+        $registration = $this->service->registerTransaction(
             $request->getParamAmount(),
             $request->getParamCurrency(),
             $request->getParamDescription()
         );
-        return response()->json($transaction->toArray(), 200);
+        return response()->json($registration->toArray(), 200);
     }
 }
