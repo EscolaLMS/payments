@@ -33,7 +33,10 @@ class EscolaLmsPaymentsServiceProvider extends ServiceProvider
 
         $this->app->singleton(
             StripeClient::class,
-            fn($app) => new StripeClient([$app['config']->get('escolalms.payments.stripe.secret_key')])
+            fn($app) => new StripeClient([
+                'api_base' => [$app['config']->get('escolalms.payments.stripe.api_base')],
+                'api_key' => [$app['config']->get('escolalms.payments.stripe.secret_key')],
+            ]),
         );
 
         $this->app->singleton(Alcohol\ISO4217::class);
