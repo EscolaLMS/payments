@@ -17,8 +17,7 @@ class PaymentsService implements PaymentsServiceContract
             'description' => $description,
             'buyer_id' => Auth::user()->id,
         ]);
-        $ok = $registration->save();
-        if (!$ok) {
+        if (!$registration->save()) {
             throw new \Exception(
                 sprintf(
                     "Could not register new transaction with amount %d, currency %s, description %s, buyer_id %d",
