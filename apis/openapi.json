@@ -1,0 +1,115 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "EscolaLMS",
+        "version": "0.0.1"
+    },
+    "paths": {
+        "/api/payments/gateway": {
+            "post": {
+                "operationId": "EscolaLms\\Payments\\Http\\Controllers\\Contracts\\PaymentsApiContract::gateway",
+                "requestBody": {
+                    "description": "Request body varies upon registered provider",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Response varies upon registered provider"
+                    }
+                }
+            }
+        },
+        "/api/payments/transaction": {
+            "put": {
+                "operationId": "EscolaLms\\Payments\\Http\\Controllers\\Contracts\\PaymentsApiContract::registerTransaction",
+                "requestBody": {
+                    "description": "Register a new payment",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransactionRegistrationRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Transaction had been registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransactionRegistration"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "endpoint requires authentication"
+                    },
+                    "403": {
+                        "description": "user doesn't have required access rights"
+                    },
+                    "422": {
+                        "description": "one of the parameters has invalid format"
+                    },
+                    "500": {
+                        "description": "server-side error"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "TransactionRegistrationRequest": {
+                "required": [
+                    "amount",
+                    "currency"
+                ],
+                "properties": {
+                    "amount": {
+                        "description": "amount of currency to charge",
+                        "type": "integer"
+                    },
+                    "currency": {
+                        "description": "Currency code defined as alpha 3 in ISO 4217",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "short description text that will show up in payment dialog",
+                        "type": "string",
+                        "maxLength": 255
+                    }
+                },
+                "type": "object"
+            },
+            "TransactionRegistration": {
+                "required": [
+                    "amount",
+                    "currency"
+                ],
+                "properties": {
+                    "amount": {
+                        "description": "amount of currency to charge",
+                        "type": "integer"
+                    },
+                    "currency": {
+                        "description": "Currency code defined as alpha 3 in ISO 4217",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "short description text that will show up in payment dialog",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "buyer_id": {
+                        "description": "identifier of the user object buys a good",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    }
+}
