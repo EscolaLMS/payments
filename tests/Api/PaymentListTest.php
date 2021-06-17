@@ -14,8 +14,6 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
 
 	public function testStudentCanListRegisteredPayments()
 	{
-		Payment::truncate();
-
 		$billable = $this->createBillableStudent();
 		$payments = Payment::factory()->count(20)->create([
 			'billable_id' => $billable->getKey(),
@@ -39,7 +37,9 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
 
 	public function testAdminCanListAllRegisteredPayments()
 	{
-		Payment::truncate();
+		if (Payment::count() > 0) {
+			Payment::truncate();
+		}
 
 		$billable = $this->createBillableStudent();
 		$payments = Payment::factory()->count(10)->create([
@@ -70,7 +70,9 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
 
 	public function testAdminCanListAllRegisteredPaymentsWithFilter()
 	{
-		Payment::truncate();
+		if (Payment::count() > 0) {
+			Payment::truncate();
+		}
 
 		$billable = $this->createBillableStudent();
 		$paymentsNew = Payment::factory()->count(5)->create([
