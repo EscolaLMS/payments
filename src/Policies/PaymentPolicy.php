@@ -18,7 +18,7 @@ class PaymentPolicy
      */
     public function view($user, Payment $payment)
     {
-        if ($user->hasRole('admin') || $user->can('view course')) {
+        if ($user->hasRole('admin') || $user->can('view payment')) {
             return true;
         }
 
