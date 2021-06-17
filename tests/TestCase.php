@@ -2,11 +2,9 @@
 
 namespace EscolaLms\Payments\Tests;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use EscolaLms\Payments\Providers\PaymentsServiceProvider;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
-
-use EscolaLms\Payments\Database\Seeders\DatabaseSeeder;
-use EscolaLms\Payments\EscolaLmsPaymentsServiceProvider;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Passport\PassportServiceProvider;
 use Spatie\Permission\PermissionServiceProvider;
 
@@ -17,14 +15,13 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(DatabaseSeeder::class);
     }
 
     protected function getPackageProviders($app): array
     {
         return [
             ...parent::getPackageProviders($app),
-            EscolaLmsPaymentsServiceProvider::class,
+            PaymentsServiceProvider::class,
             PassportServiceProvider::class,
             PermissionServiceProvider::class,
         ];
@@ -32,7 +29,7 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        $app->useEnvironmentPath(__DIR__.'/..');
+        $app->useEnvironmentPath(__DIR__ . '/..');
         $app->bootstrapWith([LoadEnvironmentVariables::class]);
         parent::getEnvironmentSetUp($app);
     }
