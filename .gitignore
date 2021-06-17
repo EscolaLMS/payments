@@ -6,3 +6,4 @@ src/oa_version.php
 /phpunit.xml
 /testbench.yaml
 .env
+_ide_helper.php
