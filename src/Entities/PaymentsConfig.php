@@ -35,7 +35,7 @@ class PaymentsConfig
 
     public function getRedirectUrl(): string
     {
-        return $this->config['url_redirect'];
+        return url($this->config['url_redirect'] ?? '/');
     }
 
     public function getPaymentModel(): string

@@ -18,7 +18,7 @@ return [
      * Urls settings
      */
 
-    'url_redirect' => url(env('PAYMENTS_REDIRECT_URL', '/')),
+    'url_redirect' => env('PAYMENTS_REDIRECT_URL', '/'),
     'url_notification' => null,
 
 
