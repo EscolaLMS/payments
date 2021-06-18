@@ -12,7 +12,7 @@ return [
      */
 
     'payment_model' => env('PAYMENTS_PAYMENT_MODEL', EscolaLms\Payments\Models\Payment::class),
-    'fallback_billable_model' => env('PAYMENTS_BILLABLE_MODEL', class_exists(EscolaLms\Api\Models\User::class) ? EscolaLms\Api\Models\User::class : EscolaLms\Payments\Models\Billable::class),
+    'fallback_billable_model' => env('PAYMENTS_BILLABLE_MODEL', class_exists(App\Models\User::class) ? App\Models\User::class : EscolaLms\Payments\Models\Billable::class),
 
     /**
      * Urls settings
@@ -20,7 +20,6 @@ return [
 
     'url_redirect' => env('PAYMENTS_REDIRECT_URL', '/'),
     'url_notification' => null,
-
 
     /** 
      * Driver specific settings 
