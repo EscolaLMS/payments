@@ -11,6 +11,9 @@ use EscolaLms\Payments\Services\Contracts\PaymentsServiceContract;
 use EscolaLms\Payments\Services\PaymentsService;
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * SWAGGER_VERSION
+ */
 class PaymentsServiceProvider extends ServiceProvider
 {
     use Injectable;

@@ -8,9 +8,6 @@ use EscolaLms\Payments\Http\Responses\PaymentListResponse;
 use EscolaLms\Payments\Http\Responses\PaymentResponse;
 use EscolaLms\Payments\Models\Payment;
 
-/**
- * SWAGGER_VERSION
- */
 interface PaymentsSwagger
 {
     /**
