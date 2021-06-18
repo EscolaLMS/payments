@@ -5,107 +5,282 @@
         "version": "0.0.1"
     },
     "paths": {
-        "/api/payments/gateway": {
-            "post": {
-                "operationId": "EscolaLms\\Payments\\Http\\Controllers\\Contracts\\PaymentsApiContract::gateway",
-                "requestBody": {
-                    "description": "Request body varies upon registered provider",
-                    "required": true
-                },
+        "/api/admin/payments": {
+            "get": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Search payments",
+                "description": "Get filtered and paginated Payments",
+                "operationId": "EscolaLms\\Payments\\Http\\Controllers\\Admin\\Swagger\\PaymentsSwagger::search",
+                "parameters": [
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "created_at",
+                                "updated_at",
+                                "status",
+                                "payable_id",
+                                "billable_id",
+                                "amount"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "ASC",
+                                "DESC"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Pagination Page Number",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Pagination Per Page",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "default": 15
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Payment status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "NEW",
+                                "PAID",
+                                "CANCELLED"
+                            ]
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "Response varies upon registered provider"
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {}
+                        }
                     }
                 }
             }
         },
-        "/api/payments/transaction": {
-            "put": {
-                "operationId": "EscolaLms\\Payments\\Http\\Controllers\\Contracts\\PaymentsApiContract::registerTransaction",
-                "requestBody": {
-                    "description": "Register a new payment",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/TransactionRegistrationRequest"
-                            }
+        "/api/admin/payments/{id}": {
+            "get": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Display the specified Payment",
+                "description": "Get Payment",
+                "operationId": "EscolaLms\\Payments\\Http\\Controllers\\Admin\\Swagger\\PaymentsSwagger::show",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Payment",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {}
                         }
                     }
                 },
-                "responses": {
-                    "200": {
-                        "description": "Transaction had been registered successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TransactionRegistration"
-                                }
-                            }
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
+        "/api/payments": {
+            "get": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Search payments",
+                "description": "Get filtered and paginated Payments",
+                "operationId": "EscolaLms\\Payments\\Http\\Controllers\\Swagger\\PaymentsSwagger::search",
+                "parameters": [
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "created_at",
+                                "updated_at",
+                                "status",
+                                "payable_id",
+                                "amount"
+                            ]
                         }
                     },
-                    "401": {
-                        "description": "endpoint requires authentication"
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "ASC",
+                                "DESC"
+                            ]
+                        }
                     },
-                    "403": {
-                        "description": "user doesn't have required access rights"
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Pagination Page Number",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "default": 1
+                        }
                     },
-                    "422": {
-                        "description": "one of the parameters has invalid format"
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Pagination Per Page",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "default": 15
+                        }
                     },
-                    "500": {
-                        "description": "server-side error"
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Payment status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "NEW",
+                                "PAID",
+                                "CANCELLED"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {}
+                        }
                     }
                 }
+            }
+        },
+        "/api/payments/{id}": {
+            "get": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Display the specified Payment",
+                "description": "Get Payment",
+                "operationId": "EscolaLms\\Payments\\Http\\Controllers\\Swagger\\PaymentsSwagger::show",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of Payment",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
             }
         }
     },
     "components": {
         "schemas": {
-            "TransactionRegistrationRequest": {
+            "Payment": {
                 "required": [
                     "amount",
-                    "currency"
+                    "currency",
+                    "description"
                 ],
                 "properties": {
+                    "id": {
+                        "description": "id",
+                        "type": "integer"
+                    },
                     "amount": {
-                        "description": "amount of currency to charge",
+                        "description": "amount",
                         "type": "integer"
                     },
                     "currency": {
-                        "description": "Currency code defined as alpha 3 in ISO 4217",
+                        "description": "currency",
                         "type": "string"
                     },
                     "description": {
-                        "description": "short description text that will show up in payment dialog",
-                        "type": "string",
-                        "maxLength": 255
-                    }
-                },
-                "type": "object"
-            },
-            "TransactionRegistration": {
-                "required": [
-                    "amount",
-                    "currency"
-                ],
-                "properties": {
-                    "amount": {
-                        "description": "amount of currency to charge",
-                        "type": "integer"
-                    },
-                    "currency": {
-                        "description": "Currency code defined as alpha 3 in ISO 4217",
+                        "description": "description",
                         "type": "string"
                     },
-                    "description": {
-                        "description": "short description text that will show up in payment dialog",
-                        "type": "string",
-                        "maxLength": 255
+                    "order_id": {
+                        "description": "order_id",
+                        "type": "string"
                     },
-                    "buyer_id": {
-                        "description": "identifier of the user object buys a good",
+                    "payable_id": {
+                        "description": "payable_id",
                         "type": "integer"
+                    },
+                    "payable_type": {
+                        "description": "payable_type",
+                        "type": "string"
+                    },
+                    "billable_id": {
+                        "description": "billable_id",
+                        "type": "integer"
+                    },
+                    "billable_type": {
+                        "description": "billable_type",
+                        "type": "string"
                     }
                 },
                 "type": "object"
