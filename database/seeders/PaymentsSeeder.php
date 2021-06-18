@@ -18,24 +18,11 @@ class PaymentsSeeder extends Seeder
     {
         /** @var Model|HasFactory $model */
         $model = Payments::getPaymentsConfig()->getFallbackBillableModel();
+        $billable = $model::query()->where('email', 'student@escola-lms.com')->first();
+        if (!$billable) {
+            $billable = $model::factory()->create();
+        }
 
-        $billable = $model::factory()->create();
-        Payment::factory()
-            ->count(5)
-            ->create([
-                'billable_id' => $billable->getKey(),
-                'billable_type' => $model,
-                'status' => PaymentStatus::NEW,
-            ]);
-        Payment::factory()
-            ->count(5)
-            ->create([
-                'billable_id' => $billable->getKey(),
-                'billable_type' => $model,
-                'status' => PaymentStatus::PAID,
-            ]);
-
-        $billable = $model::factory()->create();
         Payment::factory()
             ->count(5)
             ->create([

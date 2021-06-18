@@ -9,7 +9,6 @@ use EscolaLms\Payments\Repositories\Contracts\PaymentsRepositoryContract;
 use EscolaLms\Payments\Repositories\PaymentsRepository;
 use EscolaLms\Payments\Services\Contracts\PaymentsServiceContract;
 use EscolaLms\Payments\Services\PaymentsService;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\ServiceProvider;
 
 class PaymentsServiceProvider extends ServiceProvider
