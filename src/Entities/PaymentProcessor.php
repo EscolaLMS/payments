@@ -3,19 +3,19 @@
 namespace EscolaLms\Payments\Entities;
 
 use EscolaLms\Payments\Contracts\Billable;
+use EscolaLms\Payments\Dtos\Contracts\PaymentMethodContract;
 use EscolaLms\Payments\Dtos\PaymentDto;
 use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Events\PaymentCancelled;
 use EscolaLms\Payments\Events\PaymentPaid;
 use EscolaLms\Payments\Exceptions\RedirectException;
-use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
-use EscolaLms\Payments\Dtos\Contracts\PaymentMethodContract;
-use EscolaLms\Payments\Models\Payment;
-use Omnipay\Common\Message\ResponseInterface;
 use EscolaLms\Payments\Facades\PaymentGateway;
+use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
+use EscolaLms\Payments\Models\Payment;
 use Illuminate\Database\Eloquent\Model;
 use Omnipay\Common\Message\RedirectResponseInterface;
+use Omnipay\Common\Message\ResponseInterface;
 use RuntimeException;
 
 class PaymentProcessor
@@ -76,7 +76,7 @@ class PaymentProcessor
      * 
      * @throws RedirectException|RuntimeException
      */
-    public function purchase(PaymentMethodContract $method): void
+    public function purchase(PaymentMethodContract $method): self
     {
         $this->savePayment();
         $dto = PaymentDto::instantiateFromPayment($this->payment);
@@ -92,6 +92,8 @@ class PaymentProcessor
         } else {
             throw new RuntimeException(__("Payment failed: :reason",  ['reason' => $response->getMessage()]));
         }
+
+        return $this;
     }
 
     private function setSuccessful(ResponseInterface $response): void
@@ -104,6 +106,21 @@ class PaymentProcessor
     {
         $this->setPaymentStatus(PaymentStatus::CANCELLED());
         event(new PaymentCancelled($this->payment));
+    }
+
+    public function isNew(): bool
+    {
+        return $this->getPayment()->status->is(PaymentStatus::NEW);
+    }
+
+    public function isSuccessful(): bool
+    {
+        return $this->getPayment()->status->is(PaymentStatus::PAID);
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->getPayment()->status->is(PaymentStatus::CANCELLED);
     }
 
     private function setPaymentStatus(PaymentStatus $status): bool
