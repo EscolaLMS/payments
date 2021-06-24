@@ -33,6 +33,11 @@ class PaymentsConfig
         return $this->config['drivers']['stripe']['key'];
     }
 
+    public function getStripePublishableKey(): string
+    {
+        return $this->config['drivers']['stripe']['publishable_key'];
+    }
+
     public function getRedirectUrl(): string
     {
         return url($this->config['url_redirect'] ?? '/');
