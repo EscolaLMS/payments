@@ -2,7 +2,6 @@
     "name": "escolalms/payments",
     "description": "Escola LMS Payments Package.",
     "type": "package",
-    "version": "0.0.7",
     "require": {
         "php": "^7.4|^8.0",
         "laravel/framework": "^8.0",

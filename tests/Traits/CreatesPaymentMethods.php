@@ -2,10 +2,10 @@
 
 namespace EscolaLms\Payments\Tests\Traits;
 
+use EscolaLms\Payments\Facades\Payments;
 use Illuminate\Support\Carbon;
 use Omnipay\Common\CreditCard;
 use Omnipay\Omnipay;
-use Payments;
 
 trait CreatesPaymentMethods
 {
