@@ -12,7 +12,7 @@
                 ],
                 "summary": "Search payments",
                 "description": "Get filtered and paginated Payments",
-                "operationId": "EscolaLms\\Payments\\Http\\Controllers\\Admin\\Swagger\\PaymentsSwagger::search",
+                "operationId": "3def6e493e77fb7b93a9856973553e01",
                 "parameters": [
                     {
                         "name": "order_by",
@@ -94,7 +94,7 @@
                 ],
                 "summary": "Display the specified Payment",
                 "description": "Get Payment",
-                "operationId": "EscolaLms\\Payments\\Http\\Controllers\\Admin\\Swagger\\PaymentsSwagger::show",
+                "operationId": "bb7bf9dbeefb2c260e33dd44452f4891",
                 "parameters": [
                     {
                         "name": "id",
@@ -128,7 +128,7 @@
                 ],
                 "summary": "Search payments",
                 "description": "Get filtered and paginated Payments",
-                "operationId": "EscolaLms\\Payments\\Http\\Controllers\\Swagger\\PaymentsSwagger::search",
+                "operationId": "607acc650e002580391a36165a6a0ad0",
                 "parameters": [
                     {
                         "name": "order_by",
@@ -209,7 +209,7 @@
                 ],
                 "summary": "Display the specified Payment",
                 "description": "Get Payment",
-                "operationId": "EscolaLms\\Payments\\Http\\Controllers\\Swagger\\PaymentsSwagger::show",
+                "operationId": "9a9358debbf57d654d40de34289144fc",
                 "parameters": [
                     {
                         "name": "id",
