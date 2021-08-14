@@ -16,11 +16,11 @@ trait CreatesPaymentMethods
         return $this->gateway;
     }
 
-    protected function getPaymentMethodId(): string
+    protected function getPaymentMethodId(string $creditCardNumber = '4242424242424242'): string
     {
         $card = $this->getGateway()->createCard([
             'card' => new CreditCard([
-                'number' => 4242424242424242,
+                'number' => $creditCardNumber,
                 'expiryMonth' => 12,
                 'expiryYear' => Carbon::now()->addYear()->format('Y'),
                 'cvv' => 123,

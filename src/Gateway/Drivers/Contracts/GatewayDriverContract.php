@@ -9,4 +9,5 @@ use Omnipay\Common\Message\ResponseInterface;
 interface GatewayDriverContract
 {
     public function purchase(PaymentDto $payment, PaymentMethodContract $method): ResponseInterface;
+    public function throwExceptionForResponse(ResponseInterface $response): void;
 }

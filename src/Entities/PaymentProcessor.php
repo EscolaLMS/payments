@@ -8,7 +8,9 @@ use EscolaLms\Payments\Dtos\PaymentDto;
 use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Events\PaymentCancelled;
+use EscolaLms\Payments\Events\PaymentError;
 use EscolaLms\Payments\Events\PaymentPaid;
+use EscolaLms\Payments\Exceptions\PaymentException;
 use EscolaLms\Payments\Exceptions\RedirectException;
 use EscolaLms\Payments\Facades\PaymentGateway;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
@@ -16,7 +18,6 @@ use EscolaLms\Payments\Models\Payment;
 use Illuminate\Database\Eloquent\Model;
 use Omnipay\Common\Message\RedirectResponseInterface;
 use Omnipay\Common\Message\ResponseInterface;
-use RuntimeException;
 
 class PaymentProcessor
 {
@@ -74,7 +75,7 @@ class PaymentProcessor
     /**
      * Pay for payment that is being processed
      * 
-     * @throws RedirectException|RuntimeException
+     * @throws RedirectException|PaymentException
      */
     public function purchase(PaymentMethodContract $method): self
     {
@@ -90,7 +91,10 @@ class PaymentProcessor
         } elseif ($response->isCancelled()) {
             $this->setCancelled($response);
         } else {
-            throw new RuntimeException(__("Payment failed: :reason",  ['reason' => $response->getMessage()]));
+            $this->setError($response);
+            if (PaymentGateway::getPaymentsConfig()->shouldThrowOnPaymentError()) {
+                $this->getPaymentDriver()->throwExceptionForResponse($response);
+            }
         }
 
         return $this;
@@ -106,6 +110,12 @@ class PaymentProcessor
     {
         $this->setPaymentStatus(PaymentStatus::CANCELLED());
         event(new PaymentCancelled($this->payment));
+    }
+
+    private function setError(ResponseInterface $response): void
+    {
+        $this->setPaymentStatus(PaymentStatus::FAILED());
+        event(new PaymentError($this->payment, $response->getCode(), $response->getMessage()));
     }
 
     public function isNew(): bool

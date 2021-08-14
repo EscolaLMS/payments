@@ -5,6 +5,10 @@ namespace EscolaLms\Payments\Gateway\Drivers;
 use EscolaLms\Payments\Dtos\Contracts\PaymentMethodContract;
 use EscolaLms\Payments\Dtos\PaymentDto;
 use EscolaLms\Payments\Entities\PaymentsConfig;
+use EscolaLms\Payments\Exceptions\CardDeclined;
+use EscolaLms\Payments\Exceptions\ExpiredCard;
+use EscolaLms\Payments\Exceptions\IncorrectCvc;
+use EscolaLms\Payments\Exceptions\ProcessingError;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
 use Omnipay\Common\GatewayInterface;
 use Omnipay\Common\Message\ResponseInterface;
@@ -39,5 +43,21 @@ class StripeDriver extends AbstractDriver implements GatewayDriverContract
                 'order_id' => $payment->getOrderId()
             ]
         ])->send();
+    }
+
+    public function throwExceptionForResponse(ResponseInterface $response): void
+    {
+        switch ($response->getCode()) {
+            case 'card_declined':
+                throw new CardDeclined($response->getMessage());
+            case 'expired_card':
+                throw new ExpiredCard($response->getMessage());
+            case 'incorrect_cvc':
+                throw new IncorrectCvc($response->getMessage());
+            case 'processing_error':
+                throw new ProcessingError($response->getMessage());
+            default:
+                parent::throwExceptionForResponse($response);
+        };
     }
 }

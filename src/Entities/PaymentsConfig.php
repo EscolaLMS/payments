@@ -52,4 +52,9 @@ class PaymentsConfig
     {
         return $this->config['fallback_billable_model'] ?? Billable::class;
     }
+
+    public function shouldThrowOnPaymentError(): bool
+    {
+        return true;
+    }
 }
