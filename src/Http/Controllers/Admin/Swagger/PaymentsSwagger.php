@@ -4,9 +4,8 @@ namespace EscolaLms\Payments\Http\Controllers\Admin\Swagger;
 
 use EscolaLms\Payments\Http\Requests\Admin\PaymentsSearchAdminRequest;
 use EscolaLms\Payments\Http\Requests\PaymentShowRequest;
-use EscolaLms\Payments\Http\Responses\PaymentListResponse;
-use EscolaLms\Payments\Http\Responses\PaymentResponse;
 use EscolaLms\Payments\Models\Payment;
+use Illuminate\Http\JsonResponse;
 
 interface PaymentsSwagger
 {
@@ -22,7 +21,7 @@ interface PaymentsSwagger
      *          in="query",
      *          @OA\Schema(
      *              type="string",
-     *              enum={"created_at", "updated_at", "status", "payable_id", "billable_id", "amount"}
+     *              enum={"created_at", "updated_at", "status", "payable_id", "billable_id", "amount", "order_id", "id"}
      *          ),
      *      ),
      *      @OA\Parameter(
@@ -41,7 +40,7 @@ interface PaymentsSwagger
      *          in="query",
      *          @OA\Schema(
      *              type="number",
-     *               default=1,
+     *              default=1,
      *          ),
      *      ),
      *      @OA\Parameter(
@@ -51,7 +50,7 @@ interface PaymentsSwagger
      *          in="query",
      *          @OA\Schema(
      *              type="number",
-     *               default=15,
+     *              default=15,
      *          ),
      *      ),
      *      @OA\Parameter(
@@ -62,6 +61,71 @@ interface PaymentsSwagger
      *          @OA\Schema(
      *              type="string",
      *              enum={"NEW", "PAID", "CANCELLED"}
+     *          ),
+     *      ),
+     *      @OA\Parameter(
+     *          name="order_id",
+     *          description="External order id (e.g. from payment provider)",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *          ),
+     *      ),
+     *      @OA\Parameter(
+     *          name="payable_id",
+     *          description="Id of payable (e.g. order model id)",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="number",
+     *          ),
+     *      ),
+     *      @OA\Parameter(
+     *          name="payable_type",
+     *          description="Full classname of payable model (eg. EscolaLms\Cart\Models\Order)",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *          ),
+     *      ),
+     *      @OA\Parameter(
+     *          name="billable_id",
+     *          description="Id of billable (e.g. user id, if no other billable class is used you can ignore billable_type)",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="number",
+     *          ),
+     *      ),
+     *      @OA\Parameter(
+     *          name="billable_type",
+     *          description="Full classname of billable model (eg. EscolaLms\Core\Models\User)",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *          ),
+     *      ),
+     *      @OA\Parameter(
+     *          name="date_from",
+     *          description="Date from",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              format="date-time"
+     *          ),
+     *      ),
+     *      @OA\Parameter(
+     *          name="date_to",
+     *          description="Date to",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              format="date-time"
      *          ),
      *      ),
      *      @OA\Response(
@@ -89,7 +153,7 @@ interface PaymentsSwagger
      *      )
      * )
      */
-    public function search(PaymentsSearchAdminRequest $request): PaymentListResponse;
+    public function search(PaymentsSearchAdminRequest $request): JsonResponse;
 
     /**
      * @OA\Get(
@@ -133,5 +197,5 @@ interface PaymentsSwagger
      *      )
      * )
      */
-    public function show(PaymentShowRequest $request, Payment $payment): PaymentResponse;
+    public function show(PaymentShowRequest $request, Payment $payment): JsonResponse;
 }

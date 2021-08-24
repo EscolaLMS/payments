@@ -4,7 +4,6 @@ namespace EscolaLms\Payments\Services;
 
 use EscolaLms\Core\Dtos\CriteriaDto;
 use EscolaLms\Core\Dtos\OrderDto;
-use EscolaLms\Core\Dtos\PaginationDto;
 use EscolaLms\Payments\Contracts\Payable;
 use EscolaLms\Payments\Entities\PaymentsConfig;
 use EscolaLms\Payments\Facades\PaymentGateway;
@@ -13,6 +12,7 @@ use EscolaLms\Payments\Repositories\Contracts\PaymentsRepositoryContract;
 use EscolaLms\Payments\Services\Contracts\PaymentsServiceContract;
 use EscolaLms\Payments\Entities\PaymentProcessor;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class PaymentsService implements PaymentsServiceContract
@@ -36,12 +36,9 @@ class PaymentsService implements PaymentsServiceContract
         return $query->get();
     }
 
-    public function searchPayments(
-        CriteriaDto $criteriaDto,
-        OrderDto $orderDto,
-        PaginationDto $paginationDto
-    ): Collection {
-        return $this->repository()->searchOrderAndPaginate($criteriaDto, $orderDto, $paginationDto)->get();
+    public function searchPayments(CriteriaDto $criteriaDto, OrderDto $orderDto): LengthAwarePaginator
+    {
+        return $this->repository()->searchAndOrder($criteriaDto, $orderDto)->paginate(request()->input('per_page', 15));
     }
 
     public function processPayable(Payable $payable): PaymentProcessor

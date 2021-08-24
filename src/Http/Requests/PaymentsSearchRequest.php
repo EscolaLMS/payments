@@ -5,7 +5,6 @@ namespace EscolaLms\Payments\Http\Requests;
 use BenSampo\Enum\Rules\EnumValue;
 use EscolaLms\Payments\Contracts\Billable;
 use EscolaLms\Payments\Enums\PaymentStatus;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -20,9 +19,12 @@ class PaymentsSearchRequest extends FormRequest
     {
         return [
             'status' => ['nullable', new EnumValue(PaymentStatus::class, false)],
-            'payable_id' => ['sometimes', 'nullable'],
-            'payable_type' => ['sometimes', 'nullable', 'string'],
-            'order_by' => ['sometimes', Rule::in(['created_at', 'updated_at', 'status', 'payable_id', 'billable_id', 'amount'])]
+            'payable_id' => ['sometimes', 'integer'],
+            'payable_type' => ['sometimes', 'string'],
+            'date_from' => ['sometimes', 'date'],
+            'date_to' => ['sometimes', 'date'],
+            'order_id' => ['sometimes', 'string'],
+            'order_by' => ['sometimes', Rule::in(['created_at', 'updated_at', 'status', 'payable_id', 'billable_id', 'amount', 'order_id', 'id'])]
         ];
     }
 

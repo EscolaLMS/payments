@@ -29,7 +29,7 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
 
 		/** @var TestResponse $response */
 		$response = $this->actingAs($billable)->json('GET', 'api/payments/', [
-			'limit' => 100,
+			'per_page' => 20
 		]);
 		$response->assertOk();
 		$response->assertJsonFragment([
@@ -60,7 +60,7 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
 
 		/** @var TestResponse $response */
 		$response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
-			'limit' => 100,
+			'per_page' => 20
 		]);
 		$response->assertOk();
 		$response->assertJsonFragment([
@@ -94,9 +94,7 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
 		$admin->save();
 
 		/** @var TestResponse $response */
-		$response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
-			'limit' => 100
-		]);
+		$response = $this->actingAs($admin)->json('GET', 'api/admin/payments/');
 		$response->assertOk();
 		$response->assertJsonFragment([
 			'id' => $paymentsNew[0]->getKey()
@@ -108,7 +106,6 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
 
 		/** @var TestResponse $response */
 		$response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
-			'limit' => 100,
 			'status' => PaymentStatus::PAID,
 		]);
 		$response->assertOk();
@@ -121,6 +118,21 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
 		$response->json('data');
 
 		$this->assertCountWithOrWithoutWrapper($response, 5, PaymentResource::$wrap);
+
+		/** @var TestResponse $response */
+		$response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
+			'order_id' => $paymentsNew[0]->order_id,
+		]);
+		$response->assertOk();
+		$response->assertJsonFragment([
+			'id' => $paymentsNew[0]->getKey()
+		]);
+		$response->assertJsonMissing([
+			'id' => $paymentsPaid[0]->getKey()
+		]);
+		$response->json('data');
+
+		$this->assertCountWithOrWithoutWrapper($response, 1, PaymentResource::$wrap);
 	}
 
 	private function assertCountWithOrWithoutWrapper(TestResponse $response, int $count, ?string $wrapper = null)
