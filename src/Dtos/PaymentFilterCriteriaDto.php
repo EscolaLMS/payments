@@ -8,6 +8,7 @@ use EscolaLms\Core\Repositories\Criteria\Primitives\DateCriterion;
 use EscolaLms\Core\Repositories\Criteria\Primitives\EqualCriterion;
 use EscolaLms\Payments\Repositories\Criteria\LikeCriterion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class PaymentFilterCriteriaDto extends CriteriaDto implements InstantiateFromRequest
@@ -32,10 +33,10 @@ class PaymentFilterCriteriaDto extends CriteriaDto implements InstantiateFromReq
             $criteria->push(new EqualCriterion('payable_type', $request->input('payable_type')));
         }
         if ($request->has('date_from')) {
-            $criteria->push(new DateCriterion('created_at', '>=', $request->input('date_from')));
+            $criteria->push(new DateCriterion('created_at', Carbon::parse($request->input('date_from')), '>='));
         }
         if ($request->has('date_to')) {
-            $criteria->push(new DateCriterion('created_at', '<=', $request->input('date_to')));
+            $criteria->push(new DateCriterion('created_at', Carbon::parse($request->input('date_to')), '<='));
         }
         if ($request->has('order_id')) {
             $criteria->push(new LikeCriterion('order_id', $request->input('order_id')));

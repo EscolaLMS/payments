@@ -7,6 +7,7 @@ use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Http\Resources\PaymentResource;
 use EscolaLms\Payments\Models\Payment;
 use EscolaLms\Payments\Tests\Traits\CreatesBillable;
+use Illuminate\Support\Carbon;
 use Illuminate\Testing\TestResponse;
 
 class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
@@ -118,6 +119,31 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
 		$response->json('data');
 
 		$this->assertCountWithOrWithoutWrapper($response, 5, PaymentResource::$wrap);
+
+		/** @var TestResponse */
+		$response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
+			'date_from' => Carbon::now()->addDay()->toIso8601String(),
+		]);
+		$response->assertOk();
+
+		$this->assertCountWithOrWithoutWrapper($response, 0, PaymentResource::$wrap);
+
+		/** @var TestResponse */
+		$response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
+			'date_to' => Carbon::now()->subDay()->toIso8601String(),
+		]);
+		$response->assertOk();
+
+		$this->assertCountWithOrWithoutWrapper($response, 0, PaymentResource::$wrap);
+
+		/** @var TestResponse */
+		$response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
+			'date_from' => Carbon::now()->subDay()->toIso8601String(),
+			'date_to' => Carbon::now()->addDay()->toIso8601String(),
+		]);
+		$response->assertOk();
+
+		$this->assertCountWithOrWithoutWrapper($response, 10, PaymentResource::$wrap);
 
 		/** @var TestResponse $response */
 		$response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
