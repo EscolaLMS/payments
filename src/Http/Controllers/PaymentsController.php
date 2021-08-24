@@ -21,17 +21,11 @@ class PaymentsController extends EscolaLmsBaseController implements PaymentsSwag
         $paymentFilterDto = PaymentFilterCriteriaDto::instantiateFromRequest($request);
         $orderDto = OrderDto::instantiateFromRequest($request);
 
-        return $this->sendResponse(
-            PaymentCollection::make(Payments::searchPayments($paymentFilterDto, $orderDto))->toArray($request),
-            __("Your payments search results")
-        );
+        return $this->sendResponseForResource(PaymentCollection::make(Payments::searchPayments($paymentFilterDto, $orderDto)), __("Your payments search results"));
     }
 
     public function show(PaymentShowRequest $request, Payment $payment): JsonResponse
     {
-        return $this->sendResponse(
-            PaymentResource::make($request->getPayment())->toArray($request),
-            __("Payment details")
-        );
+        return $this->sendResponseForResource(PaymentResource::make($request->getPayment()), __("Payment details"));
     }
 }
