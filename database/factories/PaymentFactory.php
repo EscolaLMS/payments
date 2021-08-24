@@ -5,6 +5,7 @@ namespace Database\Factories\EscolaLms\Payments\Models;
 use EscolaLms\Payments\Facades\Payments;
 use EscolaLms\Payments\Models\Payment;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class PaymentFactory extends Factory
 {
@@ -21,7 +22,7 @@ class PaymentFactory extends Factory
             'amount' => $this->faker->numberBetween(1, 1000),
             'currency' => Payments::getPaymentsConfig()->getDefaultCurrency(),
             'description' => $this->faker->words(3, true),
-            'order_id' => 1337
+            'order_id' => Str::random(10),
         ];
     }
 }
