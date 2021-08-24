@@ -26,7 +26,9 @@
                                 "status",
                                 "payable_id",
                                 "billable_id",
-                                "amount"
+                                "amount",
+                                "order_id",
+                                "id"
                             ]
                         }
                     },
@@ -74,6 +76,71 @@
                                 "PAID",
                                 "CANCELLED"
                             ]
+                        }
+                    },
+                    {
+                        "name": "order_id",
+                        "in": "query",
+                        "description": "External order id (e.g. from payment provider)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "payable_id",
+                        "in": "query",
+                        "description": "Id of payable (e.g. order model id)",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "payable_type",
+                        "in": "query",
+                        "description": "Full classname of payable model (eg. EscolaLms\\Cart\\Models\\Order)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "billable_id",
+                        "in": "query",
+                        "description": "Id of billable (e.g. user id, if no other billable class is used you can ignore billable_type)",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "billable_type",
+                        "in": "query",
+                        "description": "Full classname of billable model (eg. EscolaLms\\Core\\Models\\User)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "description": "Date from",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "date_to",
+                        "in": "query",
+                        "description": "Date to",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
                         }
                     }
                 ],
@@ -141,7 +208,10 @@
                                 "updated_at",
                                 "status",
                                 "payable_id",
-                                "amount"
+                                "billable_id",
+                                "amount",
+                                "order_id",
+                                "id"
                             ]
                         }
                     },
@@ -189,6 +259,53 @@
                                 "PAID",
                                 "CANCELLED"
                             ]
+                        }
+                    },
+                    {
+                        "name": "order_id",
+                        "in": "query",
+                        "description": "External order id (e.g. from payment provider)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "payable_id",
+                        "in": "query",
+                        "description": "Id of payable (e.g. order id)",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "payable_type",
+                        "in": "query",
+                        "description": "Full classname of payable model (eg. EscolaLms\\Cart\\Models\\Order)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "description": "Date from",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "date_to",
+                        "in": "query",
+                        "description": "Date to",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
                         }
                     }
                 ],
