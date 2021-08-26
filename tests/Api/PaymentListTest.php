@@ -18,12 +18,12 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
     public function testStudentCanListRegisteredPayments()
     {
         $billable = $this->createBillableStudent();
-        $payments = Payment::factory()->count(24)->create([
+        $payments = Payment::factory()->count(20)->create([
             'billable_id' => $billable->getKey(),
             'billable_type' => get_class($billable)
         ]);
         $billable2 = $this->createBillableStudent();
-        $payments2 = Payment::factory()->count(24)->create([
+        $payments2 = Payment::factory()->count(20)->create([
             'billable_id' => $billable2->getKey(),
             'billable_type' => get_class($billable2)
         ]);
@@ -36,7 +36,9 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         $response->assertJsonFragment([
             'id' => $payments[0]->getKey(),
         ]);
-        $this->assertCountWithOrWithoutWrapper($response, 20, PaymentResource::$wrap);
+
+        $response->assertJsonCount(20, 'data');
+        // $this->assertCountWithOrWithoutWrapper($response, 20, PaymentResource::$wrap);
     }
 
     public function testAdminCanListAllRegisteredPayments()
@@ -70,7 +72,11 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         $response->assertJsonFragment([
             'id' => $payments2[0]->getKey()
         ]);
-        $this->assertCountWithOrWithoutWrapper($response, 20, PaymentResource::$wrap);
+
+        $response->assertJsonCount(20, 'data');
+
+
+        // $this->assertCountWithOrWithoutWrapper($response, 20, PaymentResource::$wrap);
     }
 
     public function testAdminCanListAllRegisteredPaymentsWithFilter()
@@ -103,7 +109,9 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         $response->assertJsonFragment([
             'id' => $paymentsPaid[0]->getKey()
         ]);
-        $this->assertCountWithOrWithoutWrapper($response, 10, PaymentResource::$wrap);
+
+        $response->assertJsonCount(10, 'data');
+        // $this->assertCountWithOrWithoutWrapper($response, 10, PaymentResource::$wrap);
 
         /** @var TestResponse $response */
         $response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
@@ -118,7 +126,9 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         ]);
         $response->json('data');
 
-        $this->assertCountWithOrWithoutWrapper($response, 5, PaymentResource::$wrap);
+        $response->assertJsonCount(5, 'data');
+
+        // $this->assertCountWithOrWithoutWrapper($response, 5, PaymentResource::$wrap);
 
         /** @var TestResponse */
         $response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
@@ -126,15 +136,17 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         ]);
         $response->assertOk();
 
-        $this->assertCountWithOrWithoutWrapper($response, 0, PaymentResource::$wrap);
+        $response->assertJsonCount(0, 'data');
+        // $this->assertCountWithOrWithoutWrapper($response, 0, PaymentResource::$wrap);
 
         /** @var TestResponse */
         $response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
             'date_to' => Carbon::now()->subDay()->toIso8601String(),
         ]);
         $response->assertOk();
+        $response->assertJsonCount(0, 'data');
 
-        $this->assertCountWithOrWithoutWrapper($response, 0, PaymentResource::$wrap);
+        // $this->assertCountWithOrWithoutWrapper($response, 0, PaymentResource::$wrap);
 
         /** @var TestResponse */
         $response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
@@ -143,7 +155,8 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         ]);
         $response->assertOk();
 
-        $this->assertCountWithOrWithoutWrapper($response, 10, PaymentResource::$wrap);
+        $response->assertJsonCount(10, 'data');
+        // $this->assertCountWithOrWithoutWrapper($response, 10, PaymentResource::$wrap);
 
         /** @var TestResponse $response */
         $response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
@@ -158,9 +171,11 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         ]);
         $response->json('data');
 
-        $this->assertCountWithOrWithoutWrapper($response, 1, PaymentResource::$wrap);
+        $response->assertJsonCount(1, 'data');
+        // $this->assertCountWithOrWithoutWrapper($response, 1, PaymentResource::$wrap);
     }
 
+    /*
     private function assertCountWithOrWithoutWrapper(TestResponse $response, int $count, ?string $wrapper = null)
     {
         $data = null;
@@ -173,4 +188,5 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
             $response->assertJsonCount($count);
         }
     }
+    */
 }
