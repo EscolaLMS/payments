@@ -7,3 +7,4 @@ src/oa_version.php
 /testbench.yaml
 .env
 _ide_helper.php
+composer.lock
