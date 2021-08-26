@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b5e0901b7c2524c862d6f9290720c23e",
+    "content-hash": "56d0576d61d8c76a737b8349c793196b",
     "packages": [
         {
             "name": "bensampo/laravel-enum",
@@ -662,16 +662,16 @@
         },
         {
             "name": "escolalms/core",
-            "version": "1.0.13",
+            "version": "1.0.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EscolaLMS/Core.git",
-                "reference": "f492663c9a07e48f5ceb2c7659976014a04c98ea"
+                "reference": "103a9f7d59edc57c173888e952c4cb9a7079e185"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EscolaLMS/Core/zipball/f492663c9a07e48f5ceb2c7659976014a04c98ea",
-                "reference": "f492663c9a07e48f5ceb2c7659976014a04c98ea",
+                "url": "https://api.github.com/repos/EscolaLMS/Core/zipball/103a9f7d59edc57c173888e952c4cb9a7079e185",
+                "reference": "103a9f7d59edc57c173888e952c4cb9a7079e185",
                 "shasum": ""
             },
             "require": {
@@ -718,9 +718,9 @@
             "description": "Escola Headless LMS",
             "support": {
                 "issues": "https://github.com/EscolaLMS/Core/issues",
-                "source": "https://github.com/EscolaLMS/Core/tree/1.0.13"
+                "source": "https://github.com/EscolaLMS/Core/tree/1.0.16"
             },
-            "time": "2021-07-06T14:13:19+00:00"
+            "time": "2021-08-25T16:14:00+00:00"
         },
         {
             "name": "firebase/php-jwt",
@@ -1330,16 +1330,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v8.55.0",
+            "version": "v8.56.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "997e2aa23e9103137715018ae926c52f8a1703f2"
+                "reference": "d700f336dc672dcbfe46db05d4e5fe9347b3a5b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/997e2aa23e9103137715018ae926c52f8a1703f2",
-                "reference": "997e2aa23e9103137715018ae926c52f8a1703f2",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/d700f336dc672dcbfe46db05d4e5fe9347b3a5b6",
+                "reference": "d700f336dc672dcbfe46db05d4e5fe9347b3a5b6",
                 "shasum": ""
             },
             "require": {
@@ -1494,7 +1494,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2021-08-17T14:13:34+00:00"
+            "time": "2021-08-24T13:46:30+00:00"
         },
         {
             "name": "laravel/passport",
@@ -7279,16 +7279,16 @@
         },
         {
             "name": "composer/package-versions-deprecated",
-            "version": "1.11.99.2",
+            "version": "1.11.99.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/package-versions-deprecated.git",
-                "reference": "c6522afe5540d5fc46675043d3ed5a45a740b27c"
+                "reference": "fff576ac850c045158a250e7e27666e146e78d18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/package-versions-deprecated/zipball/c6522afe5540d5fc46675043d3ed5a45a740b27c",
-                "reference": "c6522afe5540d5fc46675043d3ed5a45a740b27c",
+                "url": "https://api.github.com/repos/composer/package-versions-deprecated/zipball/fff576ac850c045158a250e7e27666e146e78d18",
+                "reference": "fff576ac850c045158a250e7e27666e146e78d18",
                 "shasum": ""
             },
             "require": {
@@ -7332,7 +7332,7 @@
             "description": "Composer plugin that provides efficient querying for installed package versions (no runtime IO)",
             "support": {
                 "issues": "https://github.com/composer/package-versions-deprecated/issues",
-                "source": "https://github.com/composer/package-versions-deprecated/tree/1.11.99.2"
+                "source": "https://github.com/composer/package-versions-deprecated/tree/1.11.99.3"
             },
             "funding": [
                 {
@@ -7348,7 +7348,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-05-24T07:46:03+00:00"
+            "time": "2021-08-17T13:49:14+00:00"
         },
         {
             "name": "composer/semver",
@@ -8615,22 +8615,22 @@
         },
         {
             "name": "orchestra/testbench",
-            "version": "v6.20.0",
+            "version": "v6.20.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench.git",
-                "reference": "b9f7b932a5533739effa7c0da8a54d9217476c24"
+                "reference": "986ff30846bca4547cf11ed422511673450dcb02"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench/zipball/b9f7b932a5533739effa7c0da8a54d9217476c24",
-                "reference": "b9f7b932a5533739effa7c0da8a54d9217476c24",
+                "url": "https://api.github.com/repos/orchestral/testbench/zipball/986ff30846bca4547cf11ed422511673450dcb02",
+                "reference": "986ff30846bca4547cf11ed422511673450dcb02",
                 "shasum": ""
             },
             "require": {
                 "laravel/framework": "^8.54",
                 "mockery/mockery": "^1.4.2",
-                "orchestra/testbench-core": "^6.24",
+                "orchestra/testbench-core": "^6.24.1",
                 "php": "^7.3 || ^8.0",
                 "phpunit/phpunit": "^8.4 || ^9.3.3",
                 "spatie/laravel-ray": "^1.18"
@@ -8664,7 +8664,7 @@
             ],
             "support": {
                 "issues": "https://github.com/orchestral/testbench/issues",
-                "source": "https://github.com/orchestral/testbench/tree/v6.20.0"
+                "source": "https://github.com/orchestral/testbench/tree/v6.20.1"
             },
             "funding": [
                 {
@@ -8676,20 +8676,20 @@
                     "type": "liberapay"
                 }
             ],
-            "time": "2021-08-12T00:53:59+00:00"
+            "time": "2021-08-25T05:23:48+00:00"
         },
         {
             "name": "orchestra/testbench-core",
-            "version": "v6.24.0",
+            "version": "v6.24.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench-core.git",
-                "reference": "fdd33d553480ff2192755806fca641bcd79ab04b"
+                "reference": "0e77a2e62cf9be1e541cb44f65d3ac4774015c87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/fdd33d553480ff2192755806fca641bcd79ab04b",
-                "reference": "fdd33d553480ff2192755806fca641bcd79ab04b",
+                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/0e77a2e62cf9be1e541cb44f65d3ac4774015c87",
+                "reference": "0e77a2e62cf9be1e541cb44f65d3ac4774015c87",
                 "shasum": ""
             },
             "require": {
@@ -8763,7 +8763,7 @@
                     "type": "liberapay"
                 }
             ],
-            "time": "2021-08-12T00:45:07+00:00"
+            "time": "2021-08-25T05:01:24+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -10856,20 +10856,20 @@
         },
         {
             "name": "spatie/macroable",
-            "version": "1.0.1",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/macroable.git",
-                "reference": "7a99549fc001c925714b329220dea680c04bfa48"
+                "reference": "ec2c320f932e730607aff8052c44183cf3ecb072"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/macroable/zipball/7a99549fc001c925714b329220dea680c04bfa48",
-                "reference": "7a99549fc001c925714b329220dea680c04bfa48",
+                "url": "https://api.github.com/repos/spatie/macroable/zipball/ec2c320f932e730607aff8052c44183cf3ecb072",
+                "reference": "ec2c320f932e730607aff8052c44183cf3ecb072",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2|^8.0"
+                "php": "^8.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^8.0|^9.3"
@@ -10900,9 +10900,9 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/macroable/issues",
-                "source": "https://github.com/spatie/macroable/tree/1.0.1"
+                "source": "https://github.com/spatie/macroable/tree/2.0.0"
             },
-            "time": "2020-11-03T10:15:05+00:00"
+            "time": "2021-03-26T22:39:02+00:00"
         },
         {
             "name": "spatie/ray",
@@ -11439,5 +11439,5 @@
         "php": "^7.4|^8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.0.0"
 }
