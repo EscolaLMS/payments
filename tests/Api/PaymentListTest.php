@@ -110,7 +110,7 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
             'id' => $paymentsPaid[0]->getKey()
         ]);
 
-        $response->assertJsonCount(20, 'data');
+        $response->assertJsonCount(10, 'data');
         // $this->assertCountWithOrWithoutWrapper($response, 10, PaymentResource::$wrap);
 
         /** @var TestResponse $response */
@@ -136,7 +136,8 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         ]);
         $response->assertOk();
 
-        $this->assertCountWithOrWithoutWrapper($response, 0, PaymentResource::$wrap);
+        $response->assertJsonCount(0, 'data');
+        // $this->assertCountWithOrWithoutWrapper($response, 0, PaymentResource::$wrap);
 
         /** @var TestResponse */
         $response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
@@ -170,7 +171,7 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         ]);
         $response->json('data');
 
-        $response->assertJsonCount(20, 'data');
+        $response->assertJsonCount(1, 'data');
         // $this->assertCountWithOrWithoutWrapper($response, 1, PaymentResource::$wrap);
     }
 
