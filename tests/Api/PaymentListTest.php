@@ -91,6 +91,9 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
             'billable_type' => get_class($billable),
             'status' => PaymentStatus::NEW,
         ]);
+        $paymentsNew[0]->order_id = '3L1T3';
+        $paymentsNew[0]->save();
+
         $paymentsPaid = Payment::factory()->count(5)->create([
             'billable_id' => $billable->getKey(),
             'billable_type' => get_class($billable),
@@ -163,6 +166,7 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
             'order_id' => $paymentsNew[0]->order_id,
         ]);
         $response->assertOk();
+
         $response->assertJsonFragment([
             'id' => $paymentsNew[0]->getKey()
         ]);
