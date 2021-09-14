@@ -15,6 +15,9 @@ interface PaymentsSwagger
      *      summary="Search payments",
      *      tags={"Payments"},
      *      description="Get filtered and paginated Payments",
+     *      security={
+     *         {"passport": {}},
+     *     },
      *      @OA\Parameter(
      *          name="order_by",
      *          required=false,
