@@ -13,8 +13,11 @@ interface PaymentsSwagger
      * @OA\Get(
      *      path="/api/admin/payments",
      *      summary="Search payments",
-     *      tags={"Payments"},
+     *      tags={"Admin Payments"},
      *      description="Get filtered and paginated Payments",
+     *      security={
+     *         {"passport": {}},
+     *     },
      *      @OA\Parameter(
      *          name="order_by",
      *          required=false,
@@ -159,9 +162,9 @@ interface PaymentsSwagger
      * @OA\Get(
      *      path="/api/admin/payments/{id}",
      *      summary="Display the specified Payment",
-     *      tags={"Payments"},
+     *      tags={"Admin Payments"},
      *      description="Get Payment",
-     *     security={
+     *      security={
      *         {"passport": {}},
      *     },
      *      @OA\Parameter(
