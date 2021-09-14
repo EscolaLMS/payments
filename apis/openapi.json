@@ -8,7 +8,7 @@
         "/api/admin/payments": {
             "get": {
                 "tags": [
-                    "Payments"
+                    "Admin Payments"
                 ],
                 "summary": "Search payments",
                 "description": "Get filtered and paginated Payments",
@@ -151,13 +151,18 @@
                             "application/json": {}
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
             }
         },
         "/api/admin/payments/{id}": {
             "get": {
                 "tags": [
-                    "Payments"
+                    "Admin Payments"
                 ],
                 "summary": "Display the specified Payment",
                 "description": "Get Payment",
@@ -316,7 +321,12 @@
                             "application/json": {}
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
             }
         },
         "/api/payments/{id}": {
