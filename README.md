@@ -6,6 +6,7 @@
 [![downloads](https://img.shields.io/packagist/dt/escolalms/payments)](https://packagist.org/packages/escolalms/payments)
 [![downloads](https://img.shields.io/packagist/v/escolalms/payments)](https://packagist.org/packages/escolalms/payments)
 [![downloads](https://img.shields.io/packagist/l/escolalms/payments)](https://packagist.org/packages/escolalms/payments)
+[![Maintainability](https://api.codeclimate.com/v1/badges/e42a94f20c76b719fc38/maintainability)](https://codeclimate.com/github/EscolaLMS/payments/maintainability)
 
 ## Facades
 
