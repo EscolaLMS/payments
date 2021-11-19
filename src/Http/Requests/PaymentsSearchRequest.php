@@ -5,6 +5,7 @@ namespace EscolaLms\Payments\Http\Requests;
 use BenSampo\Enum\Rules\EnumValue;
 use EscolaLms\Payments\Contracts\Billable;
 use EscolaLms\Payments\Enums\PaymentStatus;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -34,7 +35,7 @@ class PaymentsSearchRequest extends FormRequest
         $user = $this->user();
         $this->merge([
             'billable_id' => $user->getKey(),
-            'billable_type' => $user instanceof Billable ? get_class($user) : null
+            'billable_type' => ($user instanceof Billable && $user instanceof Model) ? $user->getMorphClass() : null
         ]);
     }
 }
