@@ -20,12 +20,12 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         $billable = $this->createBillableStudent();
         $payments = Payment::factory()->count(20)->create([
             'billable_id' => $billable->getKey(),
-            'billable_type' => get_class($billable)
+            'billable_type' => $billable->getMorphClass(),
         ]);
         $billable2 = $this->createBillableStudent();
         $payments2 = Payment::factory()->count(20)->create([
             'billable_id' => $billable2->getKey(),
-            'billable_type' => get_class($billable2)
+            'billable_type' => $billable2->getMorphClass(),
         ]);
 
         /** @var TestResponse $response */
@@ -50,12 +50,12 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         $billable = $this->createBillableStudent();
         $payments = Payment::factory()->count(10)->create([
             'billable_id' => $billable->getKey(),
-            'billable_type' => get_class($billable)
+            'billable_type' => $billable->getMorphClass(),
         ]);
         $billable2 = $this->createBillableStudent();
         $payments2 = Payment::factory()->count(10)->create([
             'billable_id' => $billable2->getKey(),
-            'billable_type' => get_class($billable2)
+            'billable_type' => $billable2->getMorphClass(),
         ]);
 
         $admin = $this->makeAdmin();
@@ -88,12 +88,12 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         $billable = $this->createBillableStudent();
         $paymentsNew = Payment::factory()->count(5)->create([
             'billable_id' => $billable->getKey(),
-            'billable_type' => get_class($billable),
+            'billable_type' => $billable->getMorphClass(),
             'status' => PaymentStatus::NEW,
         ]);
         $paymentsPaid = Payment::factory()->count(5)->create([
             'billable_id' => $billable->getKey(),
-            'billable_type' => get_class($billable),
+            'billable_type' => $billable->getMorphClass(),
             'status' => PaymentStatus::PAID,
         ]);
 
