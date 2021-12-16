@@ -8,8 +8,8 @@ use EscolaLms\Payments\Dtos\PaymentDto;
 use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Events\PaymentCancelled;
-use EscolaLms\Payments\Events\PaymentError;
-use EscolaLms\Payments\Events\PaymentPaid;
+use EscolaLms\Payments\Events\EscolaLmsPaymentFailedTemplateEvent;
+use EscolaLms\Payments\Events\EscolaLmsPaymentSuccessTemplateEvent;
 use EscolaLms\Payments\Exceptions\PaymentException;
 use EscolaLms\Payments\Exceptions\RedirectException;
 use EscolaLms\Payments\Facades\PaymentGateway;
@@ -74,7 +74,7 @@ class PaymentProcessor
 
     /**
      * Pay for payment that is being processed
-     * 
+     *
      * @throws RedirectException|PaymentException
      */
     public function purchase(PaymentMethodContract $method): self
@@ -103,7 +103,7 @@ class PaymentProcessor
     private function setSuccessful(ResponseInterface $response): void
     {
         $this->setPaymentStatus(PaymentStatus::PAID());
-        event(new PaymentPaid($this->payment));
+        event(new EscolaLmsPaymentSuccessTemplateEvent($this->payment));
     }
 
     private function setCancelled(ResponseInterface $response): void
@@ -115,7 +115,7 @@ class PaymentProcessor
     private function setError(ResponseInterface $response): void
     {
         $this->setPaymentStatus(PaymentStatus::FAILED());
-        event(new PaymentError($this->payment, $response->getCode(), $response->getMessage()));
+        event(new EscolaLmsPaymentFailedTemplateEvent($this->payment, $response->getCode(), $response->getMessage()));
     }
 
     public function isNew(): bool
