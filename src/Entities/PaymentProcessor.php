@@ -7,7 +7,7 @@ use EscolaLms\Payments\Dtos\Contracts\PaymentMethodContract;
 use EscolaLms\Payments\Dtos\PaymentDto;
 use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
-use EscolaLms\Payments\Events\PaymentCancelled;
+use EscolaLms\Payments\Events\EscolaLmsPaymentCancelledTemplateEvent;
 use EscolaLms\Payments\Events\EscolaLmsPaymentFailedTemplateEvent;
 use EscolaLms\Payments\Events\EscolaLmsPaymentSuccessTemplateEvent;
 use EscolaLms\Payments\Exceptions\PaymentException;
@@ -109,7 +109,7 @@ class PaymentProcessor
     private function setCancelled(ResponseInterface $response): void
     {
         $this->setPaymentStatus(PaymentStatus::CANCELLED());
-        event(new PaymentCancelled($this->payment));
+        event(new EscolaLmsPaymentCancelledTemplateEvent(auth()->user(), $this->payment));
     }
 
     private function setError(ResponseInterface $response): void
