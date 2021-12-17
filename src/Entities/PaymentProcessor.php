@@ -103,7 +103,7 @@ class PaymentProcessor
     private function setSuccessful(ResponseInterface $response): void
     {
         $this->setPaymentStatus(PaymentStatus::PAID());
-        event(new EscolaLmsPaymentSuccessTemplateEvent($this->payment));
+        event(new EscolaLmsPaymentSuccessTemplateEvent(auth()->user(), $this->payment));
     }
 
     private function setCancelled(ResponseInterface $response): void
@@ -115,7 +115,7 @@ class PaymentProcessor
     private function setError(ResponseInterface $response): void
     {
         $this->setPaymentStatus(PaymentStatus::FAILED());
-        event(new EscolaLmsPaymentFailedTemplateEvent($this->payment, $response->getCode(), $response->getMessage()));
+        event(new EscolaLmsPaymentFailedTemplateEvent(auth()->user(), $this->payment, $response->getCode(), $response->getMessage()));
     }
 
     public function isNew(): bool
