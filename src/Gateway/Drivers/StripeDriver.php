@@ -13,6 +13,7 @@ use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
 use Omnipay\Common\GatewayInterface;
 use Omnipay\Common\Message\ResponseInterface;
 use Omnipay\Omnipay;
+use Omnipay\Stripe\Message\PaymentIntents\CancelPaymentIntentRequest;
 use Omnipay\Stripe\PaymentIntentsGateway;
 
 class StripeDriver extends AbstractDriver implements GatewayDriverContract

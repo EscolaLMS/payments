@@ -82,7 +82,6 @@ class PaymentProcessor
         $this->savePayment();
         $dto = PaymentDto::instantiateFromPayment($this->payment);
         $response = $this->getPaymentDriver()->purchase($dto, $method);
-
         if ($response->isSuccessful()) {
             $this->setSuccessful($response);
         } elseif ($response->isRedirect()) {
@@ -103,19 +102,19 @@ class PaymentProcessor
     private function setSuccessful(ResponseInterface $response): void
     {
         $this->setPaymentStatus(PaymentStatus::PAID());
-        event(new EscolaLmsPaymentSuccessTemplateEvent(auth()->user(), $this->payment));
+        event(new EscolaLmsPaymentSuccessTemplateEvent($this->payment->billable, $this->payment));
     }
 
     private function setCancelled(ResponseInterface $response): void
     {
         $this->setPaymentStatus(PaymentStatus::CANCELLED());
-        event(new EscolaLmsPaymentCancelledTemplateEvent(auth()->user(), $this->payment));
+        event(new EscolaLmsPaymentCancelledTemplateEvent($this->payment->billable, $this->payment));
     }
 
     private function setError(ResponseInterface $response): void
     {
         $this->setPaymentStatus(PaymentStatus::FAILED());
-        event(new EscolaLmsPaymentFailedTemplateEvent(auth()->user(), $this->payment, $response->getCode(), $response->getMessage()));
+        event(new EscolaLmsPaymentFailedTemplateEvent($this->payment->billable, $this->payment, $response->getCode(), $response->getMessage()));
     }
 
     public function isNew(): bool
