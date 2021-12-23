@@ -5,6 +5,7 @@ namespace EscolaLms\Payments\Tests\Api;
 use EscolaLms\Payments\Dtos\PaymentMethodDto;
 use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
+use EscolaLms\Payments\Events\EscolaLmsPaymentFailedTemplateEvent;
 use EscolaLms\Payments\Exceptions\CardDeclined;
 use EscolaLms\Payments\Exceptions\ExpiredCard;
 use EscolaLms\Payments\Exceptions\IncorrectCvc;
@@ -13,6 +14,7 @@ use EscolaLms\Payments\Exceptions\ProcessingError;
 use EscolaLms\Payments\Tests\Mocks\Payable;
 use EscolaLms\Payments\Tests\Traits\CreatesBillable;
 use EscolaLms\Payments\Tests\Traits\CreatesPaymentMethods;
+use Illuminate\Support\Facades\Event;
 
 class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
 {
@@ -62,6 +64,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
 
     public function testPaymentShouldFailAndThrowException()
     {
+        Event::fake();
         $billable = $this->createBillableStudent();
         $payable = new Payable(1000, Currency::USD(), 'asdf', 1337);
         $payable->setBillable($billable);
@@ -90,6 +93,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
             }
             $payment->refresh();
             $this->assertEquals(PaymentStatus::FAILED(), $payment->status);
+            Event::assertDispatched(EscolaLmsPaymentFailedTemplateEvent::class);
         }
     }
 }
