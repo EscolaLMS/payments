@@ -260,9 +260,9 @@
                         "schema": {
                             "type": "string",
                             "enum": [
-                                "NEW",
-                                "PAID",
-                                "CANCELLED"
+                                "new",
+                                "paid",
+                                "cancelled"
                             ]
                         }
                     },
