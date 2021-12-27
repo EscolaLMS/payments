@@ -63,7 +63,7 @@ interface PaymentsSwagger
      *          in="query",
      *          @OA\Schema(
      *              type="string",
-     *              enum={"NEW", "PAID", "CANCELLED"}
+     *              enum={"new", "paid", "cancelled"}
      *          ),
      *      ),
      *      @OA\Parameter(
