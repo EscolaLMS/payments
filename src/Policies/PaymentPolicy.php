@@ -4,6 +4,7 @@ namespace EscolaLms\Payments\Policies;
 
 use EscolaLms\Core\Models\User;
 use EscolaLms\Payments\Contracts\Billable;
+use EscolaLms\Payments\Enums\PaymentsPermissionsEnum;
 use EscolaLms\Payments\Models\Payment;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
@@ -18,7 +19,7 @@ class PaymentPolicy
      */
     public function view($user, Payment $payment)
     {
-        if ($user->hasRole('admin') || $user->can('view payment')) {
+        if ($user->hasRole('admin') || $user->can(PaymentsPermissionsEnum::PAYMENTS_READ)) {
             return true;
         }
 

@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Payments\Database\Seeders;
 
+use EscolaLms\Payments\Enums\PaymentsPermissionsEnum;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -12,9 +13,12 @@ class PaymentsPermissionsSeeder extends Seeder
     {
         $admin = Role::findOrCreate('admin', 'api');
 
-        Permission::findOrCreate('search all payments', 'api');
-        Permission::findOrCreate('view payment', 'api');
+        Permission::findOrCreate(PaymentsPermissionsEnum::PAYMENTS_LIST, 'api');
+        Permission::findOrCreate(PaymentsPermissionsEnum::PAYMENTS_READ, 'api');
 
-        $admin->givePermissionTo(['view payment', 'search all payments']);
+        $admin->givePermissionTo([
+            PaymentsPermissionsEnum::PAYMENTS_LIST,
+            PaymentsPermissionsEnum::PAYMENTS_READ,
+        ]);
     }
 }
