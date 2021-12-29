@@ -6,11 +6,13 @@ use EscolaLms\Core\Dtos\CriteriaDto;
 use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Payments\Contracts\Payable;
 use EscolaLms\Payments\Entities\PaymentsConfig;
+use EscolaLms\Payments\Events\EscolaLmsPaymentRegisteredTemplateEvent;
 use EscolaLms\Payments\Facades\PaymentGateway;
 use EscolaLms\Payments\Models\Payment;
 use EscolaLms\Payments\Repositories\Contracts\PaymentsRepositoryContract;
 use EscolaLms\Payments\Services\Contracts\PaymentsServiceContract;
 use EscolaLms\Payments\Entities\PaymentProcessor;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -57,11 +59,19 @@ class PaymentsService implements PaymentsServiceContract
             $payment->billable()->associate($payable->getBillable());
         }
         $payment->save();
+
+        // Payment starts here, maybe this event fits here
+        $this->dispatchRegisterPaymentEvent($payable->getBillable(), $payment);
         return new PaymentProcessor($payment->refresh());
     }
 
     public function processPayment(Payment $payment): PaymentProcessor
     {
         return new PaymentProcessor($payment);
+    }
+
+    public function dispatchRegisterPaymentEvent(Authenticatable $user, Payment $payment)
+    {
+        event(new EscolaLmsPaymentRegisteredTemplateEvent($user, $payment));
     }
 }

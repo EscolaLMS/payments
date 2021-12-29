@@ -2,7 +2,7 @@
 
 namespace EscolaLms\Payments\Events;
 
-class EscolaLmsPaymentRegisteredTemplateEvent
+class EscolaLmsPaymentRegisteredTemplateEvent extends EscolaLmsPaymentTemplateEvent
 {
 
 }

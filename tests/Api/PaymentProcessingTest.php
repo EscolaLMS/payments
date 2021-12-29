@@ -6,6 +6,7 @@ use EscolaLms\Payments\Dtos\PaymentMethodDto;
 use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Events\EscolaLmsPaymentFailedTemplateEvent;
+use EscolaLms\Payments\Events\EscolaLmsPaymentRegisteredTemplateEvent;
 use EscolaLms\Payments\Exceptions\CardDeclined;
 use EscolaLms\Payments\Exceptions\ExpiredCard;
 use EscolaLms\Payments\Exceptions\IncorrectCvc;
@@ -23,13 +24,14 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
 
     public function testPayableCanBecomePayment()
     {
+        Event::fake([EscolaLmsPaymentRegisteredTemplateEvent::class]);
         $billable = $this->createBillableStudent();
         $payable = new Payable(1000, Currency::USD(), 'asdf', 1337);
         $payable->setBillable($billable);
 
         $processor = $payable->process();
         $payment = $processor->getPayment();
-
+        Event::assertDispatched(EscolaLmsPaymentRegisteredTemplateEvent::class);
         $this->assertEquals($payable->getPaymentAmount(), $payment->amount);
         $this->assertEquals($payable->getPaymentDescription(), $payment->description);
         $this->assertEquals($payable->getPaymentOrderId(), $payment->order_id);
@@ -39,11 +41,13 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
 
     public function testPayableCanBecomePaymentAndBePaid()
     {
+        Event::fake([EscolaLmsPaymentRegisteredTemplateEvent::class]);
         $billable = $this->createBillableStudent();
         $payable = new Payable(1000, Currency::USD(), 'asdf', 1337);
         $payable->setBillable($billable);
 
         $processor = $payable->process();
+        Event::assertDispatched(EscolaLmsPaymentRegisteredTemplateEvent::class);
         $payment = $processor->getPayment();
         $this->assertEquals(PaymentStatus::NEW(), $payment->status);
 
