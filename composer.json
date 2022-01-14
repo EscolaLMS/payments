@@ -14,10 +14,15 @@
         "nunomaduro/collision": "^5.4",
         "nunomaduro/larastan": "^0.7.6",
         "orchestra/testbench": "~5|~6",
-        "phpunit/phpunit": "^9.0"
+        "phpunit/phpunit": "^9.0",
+        "escolalms/settings": "^0.1.7"
+    },
+    "suggest": {
+        "escolalms/settings": "For settings to work"
     },
     "license": "Apache-2.0",
-    "authors": [{
+    "authors": [
+        {
             "name": "Paweł Chołaj",
             "email": "pawel.cholaj@escola.pl",
             "homepage": "https://cholaj.pl"
