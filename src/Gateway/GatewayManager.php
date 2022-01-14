@@ -15,7 +15,7 @@ class GatewayManager extends Manager
     public function __construct(Container $container)
     {
         parent::__construct($container);
-        $this->paymentsConfig = new PaymentsConfig($this->config['payments']);
+        $this->paymentsConfig = new PaymentsConfig($this->config['escolalms_payments']);
     }
 
     public function getPaymentsConfig(): PaymentsConfig
