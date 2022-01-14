@@ -3,6 +3,7 @@
 namespace EscolaLms\Payments\Tests\APIs;
 
 use EscolaLms\Core\Tests\CreatesUsers;
+use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Tests\TestCase;
 use EscolaLms\Settings\Database\Seeders\PermissionTableSeeder as SettingsPermissionSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -51,7 +52,9 @@ class PaymentAdministrableConfigTest extends TestCase
                         'key' => 'key_value',
                         'publishable_key' => 'publishable_key_value'
                     ]
-                ]
+                ],
+                'default_gateway' => 'Stripe',
+                'default_currency' => Currency::USD
             ]
         ]);
     }
