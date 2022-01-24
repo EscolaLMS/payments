@@ -2,15 +2,15 @@
 
 namespace EscolaLms\Payments\Events;
 
-use EscolaLms\Payments\Models\Payment;
+use EscolaLms\Payments\Models\Payment as PaymentModel;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class EscolaLmsPaymentFailedTemplateEvent extends EscolaLmsPaymentTemplateEvent
+class PaymentFailed extends Payment
 {
     private ?string $code;
     private ?string $message;
 
-    public function __construct(Authenticatable $user, Payment $payment, ?string $code = null, ?string $message = null)
+    public function __construct(Authenticatable $user, PaymentModel $payment, ?string $code = null, ?string $message = null)
     {
         $this->code = $code;
         $this->message = $message;

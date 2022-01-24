@@ -6,7 +6,7 @@ use EscolaLms\Core\Dtos\CriteriaDto;
 use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Payments\Contracts\Payable;
 use EscolaLms\Payments\Entities\PaymentsConfig;
-use EscolaLms\Payments\Events\EscolaLmsPaymentRegisteredTemplateEvent;
+use EscolaLms\Payments\Events\PaymentRegistered;
 use EscolaLms\Payments\Facades\PaymentGateway;
 use EscolaLms\Payments\Models\Payment;
 use EscolaLms\Payments\Repositories\Contracts\PaymentsRepositoryContract;
@@ -72,6 +72,6 @@ class PaymentsService implements PaymentsServiceContract
 
     public function dispatchRegisterPaymentEvent(Authenticatable $user, Payment $payment)
     {
-        event(new EscolaLmsPaymentRegisteredTemplateEvent($user, $payment));
+        event(new PaymentRegistered($user, $payment));
     }
 }
