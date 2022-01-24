@@ -7,9 +7,9 @@ use EscolaLms\Payments\Dtos\Contracts\PaymentMethodContract;
 use EscolaLms\Payments\Dtos\PaymentDto;
 use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
-use EscolaLms\Payments\Events\EscolaLmsPaymentCancelledTemplateEvent;
-use EscolaLms\Payments\Events\EscolaLmsPaymentFailedTemplateEvent;
-use EscolaLms\Payments\Events\EscolaLmsPaymentSuccessTemplateEvent;
+use EscolaLms\Payments\Events\PaymentCancelled;
+use EscolaLms\Payments\Events\PaymentFailed;
+use EscolaLms\Payments\Events\PaymentSuccess;
 use EscolaLms\Payments\Exceptions\PaymentException;
 use EscolaLms\Payments\Exceptions\RedirectException;
 use EscolaLms\Payments\Facades\PaymentGateway;
@@ -102,19 +102,19 @@ class PaymentProcessor
     private function setSuccessful(ResponseInterface $response): void
     {
         $this->setPaymentStatus(PaymentStatus::PAID());
-        event(new EscolaLmsPaymentSuccessTemplateEvent($this->payment->billable, $this->payment));
+        event(new PaymentSuccess($this->payment->billable, $this->payment));
     }
 
     private function setCancelled(ResponseInterface $response): void
     {
         $this->setPaymentStatus(PaymentStatus::CANCELLED());
-        event(new EscolaLmsPaymentCancelledTemplateEvent($this->payment->billable, $this->payment));
+        event(new PaymentCancelled($this->payment->billable, $this->payment));
     }
 
     private function setError(ResponseInterface $response): void
     {
         $this->setPaymentStatus(PaymentStatus::FAILED());
-        event(new EscolaLmsPaymentFailedTemplateEvent($this->payment->billable, $this->payment, $response->getCode(), $response->getMessage()));
+        event(new PaymentFailed($this->payment->billable, $this->payment, $response->getCode(), $response->getMessage()));
     }
 
     public function isNew(): bool

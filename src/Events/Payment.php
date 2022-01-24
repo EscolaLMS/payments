@@ -2,19 +2,19 @@
 
 namespace EscolaLms\Payments\Events;
 
-use EscolaLms\Payments\Models\Payment;
+use EscolaLms\Payments\Models\Payment as PaymentModel;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-abstract class EscolaLmsPaymentTemplateEvent
+abstract class Payment
 {
     use Dispatchable, SerializesModels;
 
-    private Payment $payment;
+    private PaymentModel $payment;
     private Authenticatable $user;
 
-    public function __construct(Authenticatable $user, Payment $payment)
+    public function __construct(Authenticatable $user, PaymentModel $payment)
     {
         $this->payment = $payment;
         $this->user = $user;
@@ -23,7 +23,7 @@ abstract class EscolaLmsPaymentTemplateEvent
     /**
      * @return Payment
      */
-    public function getPayment(): Payment
+    public function getPayment(): PaymentModel
     {
         return $this->payment;
     }
