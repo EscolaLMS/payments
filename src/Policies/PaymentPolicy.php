@@ -3,18 +3,16 @@
 namespace EscolaLms\Payments\Policies;
 
 use EscolaLms\Core\Models\User;
-use EscolaLms\Payments\Contracts\Billable;
 use EscolaLms\Payments\Enums\PaymentsPermissionsEnum;
 use EscolaLms\Payments\Models\Payment;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Illuminate\Auth\Access\Response;
 
 class PaymentPolicy
 {
     use HandlesAuthorization;
 
     /**
-     * @param User|Billable $user
+     * @param User $user
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function view($user, Payment $payment)
@@ -23,10 +21,7 @@ class PaymentPolicy
             return true;
         }
 
-        $billable = $payment->billable;
-        $classname = get_class($billable);
-
-        if ($user->getKey() === $billable->getKey() && $user instanceof $classname) {
+        if ($user->getKey() === $payment->user->getKey()) {
             return true;
         };
 

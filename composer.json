@@ -7,7 +7,8 @@
         "laravel/framework": "^8|^9",
         "escolalms/core": "^1",
         "league/omnipay": "^3",
-        "omnipay/stripe": "^3.1"
+        "omnipay/stripe": "^3.1",
+        "mnastalski/przelewy24-php": "^0.0.4"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.10",

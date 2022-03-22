@@ -2,7 +2,7 @@
 
 namespace EscolaLms\Payments\Contracts;
 
-use EscolaLms\Payments\Contracts\Billable;
+use EscolaLms\Core\Models\User;
 use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Entities\PaymentProcessor;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -15,7 +15,7 @@ interface Payable
     public function getPaymentCurrency(): ?Currency;
     public function getPaymentDescription(): string;
     public function getPaymentOrderId(): ?string;
-    public function getBillable(): ?Billable;
+    public function getUser(): ?User;
 
     public function process(): PaymentProcessor;
 }

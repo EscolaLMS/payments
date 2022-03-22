@@ -15,8 +15,7 @@ class PaymentDetailsTest extends \EscolaLms\Payments\Tests\TestCase
 	{
 		$billable = $this->createBillableStudent();
 		$payment = Payment::factory()->create([
-			'billable_id' => $billable->getKey(),
-			'billable_type' => $billable->getMorphClass(),
+			'user_id' => $billable->getKey(),
 		]);
 
 		$response = $this->actingAs($billable)->json('GET', 'api/payments/' . $payment->getKey());
@@ -31,8 +30,7 @@ class PaymentDetailsTest extends \EscolaLms\Payments\Tests\TestCase
 		$billable = $this->createBillableStudent();
 		$billable2 = $this->createBillableStudent();
 		$payment = Payment::factory()->create([
-			'billable_id' => $billable->getKey(),
-			'billable_type' => $billable->getMorphClass(),
+			'user_id' => $billable->getKey(),
 		]);
 
 		$response = $this->actingAs($billable2)->json('GET', 'api/payments/' . $payment->getKey());
@@ -43,14 +41,13 @@ class PaymentDetailsTest extends \EscolaLms\Payments\Tests\TestCase
 	{
 		$billable = $this->createBillableStudent();
 		$payment = Payment::factory()->create([
-			'billable_id' => $billable->getKey(),
-			'billable_type' => $billable->getMorphClass(),
+			'user_id' => $billable->getKey(),
 		]);
 
 		$admin = $this->makeAdmin();
 		$admin->save();
 
-		$response = $this->actingAs($admin)->json('GET', 'api/admin/payments/' . $payment->getKey());
+		$response = $this->actingAs($admin, 'api')->json('GET', 'api/admin/payments/' . $payment->getKey());
 		$response->assertOk();
 		$response->assertJsonFragment([
 			'id' => $payment->getKey()

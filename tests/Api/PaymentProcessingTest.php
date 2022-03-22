@@ -2,7 +2,6 @@
 
 namespace EscolaLms\Payments\Tests\Api;
 
-use EscolaLms\Payments\Dtos\PaymentMethodDto;
 use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Events\PaymentFailed;
@@ -27,7 +26,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         Event::fake([PaymentRegistered::class]);
         $billable = $this->createBillableStudent();
         $payable = new Payable(1000, Currency::USD(), 'asdf', 1337);
-        $payable->setBillable($billable);
+        $payable->setUser($billable);
 
         $processor = $payable->process();
         $payment = $processor->getPayment();
@@ -36,7 +35,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         $this->assertEquals($payable->getPaymentDescription(), $payment->description);
         $this->assertEquals($payable->getPaymentOrderId(), $payment->order_id);
         $this->assertEquals($payable->getPaymentCurrency(), $payment->currency);
-        $this->assertEquals($payable->getBillable()->getKey(), $payment->billable->getKey());
+        $this->assertEquals($payable->getUser()->getKey(), $payment->user->getKey());
     }
 
     public function testPayableCanBecomePaymentAndBePaid()
@@ -44,7 +43,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         Event::fake([PaymentRegistered::class]);
         $billable = $this->createBillableStudent();
         $payable = new Payable(1000, Currency::USD(), 'asdf', 1337);
-        $payable->setBillable($billable);
+        $payable->setUser($billable);
 
         $processor = $payable->process();
         Event::assertDispatched(PaymentRegistered::class);
@@ -52,9 +51,8 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         $this->assertEquals(PaymentStatus::NEW(), $payment->status);
 
         $paymentMethodId = $this->getPaymentMethodId();
-        $paymentMethodDto = new PaymentMethodDto($paymentMethodId);
 
-        $processor->purchase($paymentMethodDto);
+        $processor->purchase(['paymentMethod' => $paymentMethodId, 'returnUrl' => url('/')]);
         $payment->refresh();
 
         $this->assertEquals(PaymentStatus::PAID(), $payment->status);
@@ -71,7 +69,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         Event::fake();
         $billable = $this->createBillableStudent();
         $payable = new Payable(1000, Currency::USD(), 'asdf', 1337);
-        $payable->setBillable($billable);
+        $payable->setUser($billable);
 
         $wrongCardNumbers = [
             '4000000000000002' => CardDeclined::class,
@@ -89,9 +87,8 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
             $payment = $processor->getPayment();
             $this->assertEquals(PaymentStatus::NEW(), $payment->status);
             $paymentMethodId = $this->getPaymentMethodId($wrongCardNumber);
-            $paymentMethodDto = new PaymentMethodDto($paymentMethodId);
             try {
-                $processor->purchase($paymentMethodDto);
+                $processor->purchase(['paymentMethod' => $paymentMethodId, 'returnUrl' => url('/')]);
             } catch (PaymentException $ex) {
                 $this->assertInstanceOf($expectedException, $ex);
             }

@@ -17,5 +17,6 @@ interface PaymentsServiceContract
     public function processPayable(Payable $payable): PaymentProcessor;
     public function processPayment(Payment $payment): PaymentProcessor;
     public function searchPayments(CriteriaDto $criteriaDto, OrderDto $orderDto): LengthAwarePaginator;
-    public function listPaymentsForBillable(int $billable_id, ?string $billable_type): Collection;
+    public function listPaymentsForUser(int $user_id): Collection;
+    public function findPayment(int $id): ?Payment;
 }

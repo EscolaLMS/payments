@@ -2,9 +2,7 @@
 
 namespace EscolaLms\Payments\Entities;
 
-use EscolaLms\Payments\Contracts\Billable;
 use EscolaLms\Payments\Enums\Currency;
-use EscolaLms\Payments\Models\Payment;
 
 class PaymentsConfig
 {
@@ -28,9 +26,9 @@ class PaymentsConfig
         return Currency::USD();
     }
 
-    public function getStripeApiKey(): string
+    public function getStripeSecretKey(): string
     {
-        return $this->config['drivers']['stripe']['key'];
+        return $this->config['drivers']['stripe']['secret_key'];
     }
 
     public function getStripePublishableKey(): string
@@ -38,19 +36,33 @@ class PaymentsConfig
         return $this->config['drivers']['stripe']['publishable_key'];
     }
 
-    public function getRedirectUrl(): string
+    public function getStripeAllowedPaymentMethodTypes(): array
     {
-        return url($this->config['url_redirect'] ?? '/');
+        return $this->config['drivers']['stripe']['allowed_payment_method_types'] ?? ['card', 'p24'];
     }
 
-    public function getPaymentModel(): string
-    {
-        return $this->config['payment_model'] ?? Payment::class;
+    public function getPrzelewy24Live(): bool {
+        return $this->config['drivers']['przelewy24']['live'];
     }
 
-    public function getFallbackBillableModel(): string
+    public function getPrzelewy24MerchantId(): string
     {
-        return $this->config['fallback_billable_model'] ?? Billable::class;
+        return $this->config['drivers']['przelewy24']['merchant_id'];
+    }
+
+    public function getPrzelewy24PosId(): string
+    {
+        return $this->config['drivers']['przelewy24']['pos_id'] ?? $this->getPrzelewy24MerchantId();
+    }
+
+    public function getPrzelewy24ApiKey(): string
+    {
+        return $this->config['drivers']['przelewy24']['api_key'];
+    }
+
+    public function getPrzelewy24Crc(): string
+    {
+        return $this->config['drivers']['przelewy24']['crc'];
     }
 
     public function shouldThrowOnPaymentError(): bool

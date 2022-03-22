@@ -2,7 +2,6 @@
 
 namespace EscolaLms\Payments\Gateway\Drivers;
 
-use EscolaLms\Payments\Dtos\Contracts\PaymentMethodContract;
 use EscolaLms\Payments\Dtos\PaymentDto;
 use EscolaLms\Payments\Entities\PaymentsConfig;
 use EscolaLms\Payments\Exceptions\CardDeclined;
@@ -10,10 +9,11 @@ use EscolaLms\Payments\Exceptions\ExpiredCard;
 use EscolaLms\Payments\Exceptions\IncorrectCvc;
 use EscolaLms\Payments\Exceptions\ProcessingError;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
+use EscolaLms\Payments\Gateway\Responses\CallbackResponse;
+use Illuminate\Http\Request;
 use Omnipay\Common\GatewayInterface;
 use Omnipay\Common\Message\ResponseInterface;
 use Omnipay\Omnipay;
-use Omnipay\Stripe\Message\PaymentIntents\CancelPaymentIntentRequest;
 use Omnipay\Stripe\PaymentIntentsGateway;
 
 class StripeDriver extends AbstractDriver implements GatewayDriverContract
@@ -28,22 +28,38 @@ class StripeDriver extends AbstractDriver implements GatewayDriverContract
         $gateway = Omnipay::create('Stripe\PaymentIntents');
         assert($gateway instanceof PaymentIntentsGateway);
         $this->gateway = $gateway;
-        $this->gateway->setApiKey($this->config->getStripeApiKey());
+        $this->gateway->setApiKey($this->config->getStripeSecretKey());
     }
 
-    public function purchase(PaymentDto $payment, PaymentMethodContract $method): ResponseInterface
+    public function purchase(PaymentDto $dto, array $parameters = []): ResponseInterface
     {
+        $this->throwExceptionIfMissingParameters($parameters);
         return $this->gateway->purchase([
-            'amount' => $payment->getAmount(),
-            'currency' => (string) ($payment->getCurrency() ?? $this->config->getDefaultCurrency()),
-            'description' => $payment->getDescription(),
-            'returnUrl' => $this->config->getRedirectUrl(),
-            'paymentMethod' => $method->getPaymentMethodId(),
+            'amount' => $dto->getAmount(),
+            'currency' => (string) ($dto->getCurrency() ?? $this->config->getDefaultCurrency()),
+            'description' => $dto->getDescription(),
+            'paymentMethod' => $parameters['paymentMethod'],
+            'returnUrl' => $parameters['returnUrl'],
             'confirm' => true,
             'metadata' => [
-                'order_id' => $payment->getOrderId()
-            ]
+                'order_id' => $dto->getOrderId(),
+                'payment_id' => $dto->getPaymentId(),
+            ],
+
         ])->send();
+    }
+
+    public function callback(Request $request, array $parameters = []): CallbackResponse
+    {
+        return new CallbackResponse();
+    }
+
+    public function requiredParameters(): array
+    {
+        return [
+            'paymentMethod',
+            'returnUrl'
+        ];
     }
 
     public function throwExceptionForResponse(ResponseInterface $response): void

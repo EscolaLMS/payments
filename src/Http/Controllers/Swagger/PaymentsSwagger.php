@@ -24,7 +24,7 @@ interface PaymentsSwagger
      *          in="query",
      *          @OA\Schema(
      *              type="string",
-     *              enum={"created_at", "updated_at", "status", "payable_id", "billable_id", "amount", "order_id", "id"}
+     *              enum={"created_at", "updated_at", "status", "payable_id", "user_id", "amount", "order_id", "id"}
      *          ),
      *      ),
      *      @OA\Parameter(

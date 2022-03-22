@@ -5,24 +5,26 @@ namespace EscolaLms\Payments\Dtos;
 use EscolaLms\Core\Dtos\Contracts\DtoContract;
 use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Models\Payment;
-use Money\Money;
 
 class PaymentDto implements DtoContract
 {
     private int $amount;
     private ?Currency $currency;
     private string $description;
+    private string $paymentId;
     private ?string $orderId;
 
     public function __construct(
         int $amount,
         ?Currency $currency,
         string $description,
+        string $paymentId = null,
         ?string $orderId = null
     ) {
         $this->amount = $amount;
         $this->currency = $currency;
         $this->description = $description;
+        $this->paymentId = $paymentId;
         $this->orderId = $orderId;
     }
 
@@ -32,6 +34,7 @@ class PaymentDto implements DtoContract
             $payment->amount,
             $payment->currency,
             $payment->description,
+            (string) $payment->getKey(),
             $payment->order_id,
         );
     }
@@ -51,6 +54,11 @@ class PaymentDto implements DtoContract
         return $this->description;
     }
 
+    public function getPaymentId(): string
+    {
+        return $this->paymentId;
+    }
+
     public function getOrderId(): ?string
     {
         return $this->orderId;
@@ -62,7 +70,8 @@ class PaymentDto implements DtoContract
             'amount' => $this->getAmount(),
             'currency' => $this->getCurrency(),
             'description' => $this->getDescription(),
-            'orderId' => $this->getOrderId()
+            'paymentId' => $this->getPaymentId(),
+            'orderId' => $this->getOrderId(),
         ];
     }
 }

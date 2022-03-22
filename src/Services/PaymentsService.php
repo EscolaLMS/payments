@@ -29,13 +29,9 @@ class PaymentsService implements PaymentsServiceContract
         return PaymentGateway::getPaymentsConfig();
     }
 
-    public function listPaymentsForBillable(int $billable_id, ?string $billable_type = null): Collection
+    public function listPaymentsForUser(int $user_id): Collection
     {
-        $query = $this->repository()->allQuery()->where('billable_id', $billable_id);
-        if ($billable_type) {
-            $query->where('billable_type', $billable_type);
-        }
-        return $query->get();
+        return $this->repository()->allQuery()->where('user_id', $user_id)->get();
     }
 
     public function searchPayments(CriteriaDto $criteriaDto, OrderDto $orderDto): LengthAwarePaginator
@@ -55,14 +51,19 @@ class PaymentsService implements PaymentsServiceContract
         if ($payable instanceof Model) {
             $payment->payable()->associate($payable);
         }
-        if ($payable->getBillable() instanceof Model) {
-            $payment->billable()->associate($payable->getBillable());
+        if ($payable->getUser()) {
+            $payment->user()->associate($payable->getUser());
         }
         $payment->save();
 
         // Payment starts here, maybe this event fits here
-        $this->dispatchRegisterPaymentEvent($payable->getBillable(), $payment);
+        $this->dispatchRegisterPaymentEvent($payable->getUser(), $payment);
         return new PaymentProcessor($payment->refresh());
+    }
+
+    public function findPayment(int $id): ?Payment
+    {
+        return Payment::find($id);
     }
 
     public function processPayment(Payment $payment): PaymentProcessor

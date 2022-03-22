@@ -4,6 +4,7 @@ namespace EscolaLms\Payments\Gateway;
 
 use EscolaLms\Payments\Entities\PaymentsConfig;
 use EscolaLms\Payments\Gateway\Drivers\FreeDriver;
+use EscolaLms\Payments\Gateway\Drivers\Przelewy24Driver;
 use EscolaLms\Payments\Gateway\Drivers\StripeDriver;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Manager;
@@ -36,5 +37,10 @@ class GatewayManager extends Manager
     public function createStripeDriver(): StripeDriver
     {
         return new StripeDriver($this->paymentsConfig);
+    }
+    
+    public function createPrzelewy24Driver(): Przelewy24Driver
+    {
+        return new Przelewy24Driver($this->paymentsConfig);
     }
 }
