@@ -15,6 +15,7 @@ interface PaymentsServiceContract
 {
     public function getPaymentsConfig(): PaymentsConfig;
 
+    public function listEnabledGateways(): array;
     public function listGatewaysWithRequiredParameters(): array;
 
     public function processPayable(Payable $payable): PaymentProcessor;

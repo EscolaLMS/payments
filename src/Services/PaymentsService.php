@@ -78,15 +78,28 @@ class PaymentsService implements PaymentsServiceContract
         event(new PaymentRegistered($user, $payment));
     }
 
+    public function listEnabledGateways(): array
+    {
+        return array_filter([
+            'stripe' => $this->getPaymentsConfig()->isStripeEnabled(),
+            'przelewy24' => $this->getPaymentsConfig()->isPrzelewy24Enabled()
+        ], fn (bool $enabled) => $enabled);
+    }
+
     public function listGatewaysWithRequiredParameters(): array
     {
-        $config = [];
-        if ($this->getPaymentsConfig()->isStripeEnabled()) {
-            $config['stripe'] = StripeDriver::requiredParameters();
-        }
-        if ($this->getPaymentsConfig()->isPrzelewy24Enabled()) {
-            $config['przelewy24'] = Przelewy24Driver::requiredParameters();
-        }
-        return $config;
+        return [
+            'default_gateway' => $this->getPaymentsConfig()->getDefaultGateway(),
+            'gateways' => [
+                'stripe' => [
+                    'enabled' => $this->getPaymentsConfig()->isStripeEnabled(),
+                    'parameters' => StripeDriver::requiredParameters()
+                ],
+                'przelewy24' => [
+                    'enabled' => $this->getPaymentsConfig()->isPrzelewy24Enabled(),
+                    'parameters' => Przelewy24Driver::requiredParameters()
+                ]
+            ]
+        ];
     }
 }
