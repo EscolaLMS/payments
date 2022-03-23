@@ -1,7 +1,6 @@
 <?php
 
 use EscolaLms\Core\Migrations\EscolaMigration;
-use EscolaLms\Payments\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 

@@ -31,7 +31,7 @@ class PaymentGateway extends Facade
 
     public static function fake()
     {
-        static::swap($fake = new PaymentGatewayFake(self::getPaymentsConfig()));
+        static::swap($fake = app(PaymentGatewayFake::class));
 
         return $fake;
     }

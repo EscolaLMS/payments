@@ -7,6 +7,7 @@ use EscolaLms\Payments\Entities\PaymentsConfig;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
 use EscolaLms\Payments\Gateway\Responses\CallbackResponse;
 use EscolaLms\Payments\Gateway\Responses\Przelewy24GatewayResponse;
+use EscolaLms\Payments\Models\Payment;
 use Illuminate\Http\Request;
 use Omnipay\Common\Message\ResponseInterface;
 use Przelewy24\Exceptions\ApiResponseException;
@@ -30,19 +31,19 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
         ]);
     }
 
-    public function purchase(PaymentDto $dto, array $parameters = []): ResponseInterface
+    public function purchase(Payment $payment, array $parameters = []): ResponseInterface
     {
         $this->throwExceptionIfMissingParameters($parameters);
 
         try {
             $response = $this->gateway->transaction([
-                'amount' => $dto->getAmount(),
-                'currency' => (string) ($dto->getCurrency() ?? $this->config->getDefaultCurrency()),
-                'description' => $dto->getDescription(),
-                'url_return' => $parameters['url_return'],
-                'url_status' => route('payments-gateway-callback') . '/' . $dto->getPaymentId(),
+                'amount' => $payment->amount,
+                'currency' => (string) ($payment->currency ?? $this->config->getDefaultCurrency()),
+                'description' => $payment->description,
+                'url_return' => $parameters['return_url'],
+                'url_status' => route('payments-gateway-callback') . '/' . $payment->getKey(),
                 'email' => $parameters['email'],
-                'session_id' => $dto->getOrderId() . '-'  . $dto->getPaymentId(),
+                'session_id' => ($payment->order_id ? $payment->order_id . '_' : '') . $payment->getKey(),
             ]);
         } catch (ApiResponseException $exception) {
             return Przelewy24GatewayResponse::fromApiResponseException($exception);
@@ -64,14 +65,14 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
             ]);
             return new CallbackResponse(true, $callbackNotification->orderId());
         } catch (ApiResponseException $exception) {
-            return new CallbackResponse(false, null, $exception->getMessage());
+            return new CallbackResponse(false, $callbackNotification->orderId(), $exception->getMessage());
         }
     }
 
     public function requiredParameters(): array
     {
         return [
-            'url_return',
+            'return_url',
             'email'
         ];
     }

@@ -2,19 +2,13 @@
 
 namespace EscolaLms\Payments\Facades\Fakes;
 
-use EscolaLms\Payments\Dtos\PaymentDto;
-use EscolaLms\Payments\Gateway\Responses\NoneGatewayResponse;
-use Omnipay\Common\Message\ResponseInterface;
+use EscolaLms\Payments\Gateway\GatewayManager;
+use EscolaLms\Payments\Facades\Fakes\FakeDriver;
 
-class PaymentGatewayFake
+class PaymentGatewayFake extends GatewayManager
 {
-    public function purchase(PaymentDto $dto, array $parameters = []): ResponseInterface
+    public function driver($driver = null)
     {
-        return new NoneGatewayResponse();
-    }
-
-    public function requiredParameters(): array
-    {
-        return [];
+        return new FakeDriver($this->paymentsConfig);
     }
 }

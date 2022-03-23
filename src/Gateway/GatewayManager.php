@@ -11,7 +11,7 @@ use Illuminate\Support\Manager;
 
 class GatewayManager extends Manager
 {
-    private PaymentsConfig $paymentsConfig;
+    protected PaymentsConfig $paymentsConfig;
 
     public function __construct(Container $container)
     {

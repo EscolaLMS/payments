@@ -3,14 +3,12 @@
 namespace EscolaLms\Payments\Entities;
 
 use EscolaLms\Core\Models\User;
-use EscolaLms\Payments\Dtos\PaymentDto;
 use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Events\PaymentCancelled;
 use EscolaLms\Payments\Events\PaymentFailed;
+use EscolaLms\Payments\Events\PaymentRequiresRedirect;
 use EscolaLms\Payments\Events\PaymentSuccess;
-use EscolaLms\Payments\Exceptions\PaymentException;
-use EscolaLms\Payments\Exceptions\RedirectException;
 use EscolaLms\Payments\Facades\PaymentGateway;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
 use EscolaLms\Payments\Models\Payment;
@@ -87,24 +85,17 @@ class PaymentProcessor
         return $this;
     }
 
-    /**
-     * Pay for payment that is being processed
-     *
-     * @throws RedirectException|PaymentException
-     */
     public function purchase(array $parameters = []): self
     {
         $this->setPaymentDriverName($this->getPaymentDriverName());
         $this->savePayment();
 
-        $dto = PaymentDto::instantiateFromPayment($this->payment);
-
-        $response = $this->getPaymentDriver()->purchase($dto, $parameters);
+        $response = $this->getPaymentDriver()->purchase($this->payment, $parameters);
         if ($response->isSuccessful()) {
             $this->setSuccessful();
         } elseif ($response->isRedirect()) {
             assert($response instanceof RedirectResponseInterface);
-            throw new RedirectException($response);
+            $this->setRedirect($response->getRedirectUrl());
         } elseif ($response->isCancelled()) {
             $this->setCancelled();
         } else {
@@ -121,8 +112,10 @@ class PaymentProcessor
     {
         $callbackResponse = $this->getPaymentDriver()->callback($request);
 
+        $this->clearRedirect();
+        $this->setGatewayOrderId($callbackResponse->getGatewayOrderId());
+
         if ($callbackResponse->getSuccess()) {
-            $this->setGatewayOrderId($callbackResponse->getGatewayOrderId());
             $this->setSuccessful();
         } else {
             $this->setError($callbackResponse->getError());
@@ -135,6 +128,17 @@ class PaymentProcessor
     {
         $this->setPaymentStatus(PaymentStatus::PAID());
         event(new PaymentSuccess($this->payment->user, $this->payment));
+    }
+
+    private function clearRedirect(): void
+    {
+        $this->payment->redirect_url = null;
+    }
+
+    private function setRedirect(string $redirect_url): void
+    {
+        $this->payment->redirect_url = $redirect_url;
+        $this->setPaymentStatus(PaymentStatus::REQUIRES_REDIRECT());
     }
 
     private function setCancelled(): void

@@ -10,6 +10,7 @@ use EscolaLms\Payments\Exceptions\IncorrectCvc;
 use EscolaLms\Payments\Exceptions\ProcessingError;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
 use EscolaLms\Payments\Gateway\Responses\CallbackResponse;
+use EscolaLms\Payments\Models\Payment;
 use Illuminate\Http\Request;
 use Omnipay\Common\GatewayInterface;
 use Omnipay\Common\Message\ResponseInterface;
@@ -31,19 +32,19 @@ class StripeDriver extends AbstractDriver implements GatewayDriverContract
         $this->gateway->setApiKey($this->config->getStripeSecretKey());
     }
 
-    public function purchase(PaymentDto $dto, array $parameters = []): ResponseInterface
+    public function purchase(Payment $payment, array $parameters = []): ResponseInterface
     {
         $this->throwExceptionIfMissingParameters($parameters);
         return $this->gateway->purchase([
-            'amount' => $dto->getAmount(),
-            'currency' => (string) ($dto->getCurrency() ?? $this->config->getDefaultCurrency()),
-            'description' => $dto->getDescription(),
-            'paymentMethod' => $parameters['paymentMethod'],
-            'returnUrl' => $parameters['returnUrl'],
+            'amount' => $payment->amount,
+            'currency' => (string) ($payment->currency ?? $this->config->getDefaultCurrency()),
+            'description' => $payment->description,
+            'paymentMethod' => $parameters['payment_method'],
+            'returnUrl' => $parameters['return_url'],
             'confirm' => true,
             'metadata' => [
-                'order_id' => $dto->getOrderId(),
-                'payment_id' => $dto->getPaymentId(),
+                'order_id' => $payment->order_id,
+                'payment_id' => $payment->getKey(),
             ],
 
         ])->send();
@@ -57,8 +58,8 @@ class StripeDriver extends AbstractDriver implements GatewayDriverContract
     public function requiredParameters(): array
     {
         return [
-            'paymentMethod',
-            'returnUrl'
+            'return_url',
+            'payment_method',
         ];
     }
 

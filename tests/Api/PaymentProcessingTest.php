@@ -11,6 +11,7 @@ use EscolaLms\Payments\Exceptions\ExpiredCard;
 use EscolaLms\Payments\Exceptions\IncorrectCvc;
 use EscolaLms\Payments\Exceptions\PaymentException;
 use EscolaLms\Payments\Exceptions\ProcessingError;
+use EscolaLms\Payments\Facades\PaymentGateway;
 use EscolaLms\Payments\Tests\Mocks\Payable;
 use EscolaLms\Payments\Tests\Traits\CreatesBillable;
 use EscolaLms\Payments\Tests\Traits\CreatesPaymentMethods;
@@ -40,6 +41,8 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
 
     public function testPayableCanBecomePaymentAndBePaid()
     {
+        PaymentGateway::fake();
+
         Event::fake([PaymentRegistered::class]);
         $billable = $this->createBillableStudent();
         $payable = new Payable(1000, Currency::USD(), 'asdf', 1337);
@@ -50,9 +53,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         $payment = $processor->getPayment();
         $this->assertEquals(PaymentStatus::NEW(), $payment->status);
 
-        $paymentMethodId = $this->getPaymentMethodId();
-
-        $processor->purchase(['paymentMethod' => $paymentMethodId, 'returnUrl' => url('/')]);
+        $processor->purchase();
         $payment->refresh();
 
         $this->assertEquals(PaymentStatus::PAID(), $payment->status);
@@ -64,8 +65,42 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         ]);
     }
 
-    public function testPaymentShouldFailAndThrowException()
+    public function testPayableCanBecomePaymentAndBePaidUsingStripe()
     {
+        $this->markTestSkipped(
+            'This test calls external (Stripe) api, we probably should not run it automatically every time we run test suite'
+        );
+
+        Event::fake([PaymentRegistered::class]);
+        $billable = $this->createBillableStudent();
+        $payable = new Payable(1000, Currency::USD(), 'asdf', 1337);
+        $payable->setUser($billable);
+
+        $processor = $payable->process()->setPaymentDriverName('stripe');
+        Event::assertDispatched(PaymentRegistered::class);
+        $payment = $processor->getPayment();
+        $this->assertEquals(PaymentStatus::NEW(), $payment->status);
+
+        $paymentMethodId = $this->getPaymentMethodId();
+
+        $processor->purchase(['payment_method' => $paymentMethodId, 'return_url' => url('/')]);
+        $payment->refresh();
+
+        $this->assertEquals(PaymentStatus::PAID(), $payment->status);
+
+        $response = $this->actingAs($billable)->json('GET', 'api/payments/');
+        $response->assertOk();
+        $response->assertJsonFragment([
+            'id' => $payment->getKey()
+        ]);
+    }
+
+    public function testPaymentShouldFailAndThrowExceptionUsingStripe()
+    {
+        $this->markTestSkipped(
+            'This test calls external (Stripe) api, we probably should not run it automatically every time we run test suite'
+        );
+
         Event::fake();
         $billable = $this->createBillableStudent();
         $payable = new Payable(1000, Currency::USD(), 'asdf', 1337);
@@ -83,12 +118,12 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         ];
 
         foreach ($wrongCardNumbers as $wrongCardNumber => $expectedException) {
-            $processor = $payable->process();
+            $processor = $payable->process()->setPaymentDriverName('stripe');
             $payment = $processor->getPayment();
             $this->assertEquals(PaymentStatus::NEW(), $payment->status);
             $paymentMethodId = $this->getPaymentMethodId($wrongCardNumber);
             try {
-                $processor->purchase(['paymentMethod' => $paymentMethodId, 'returnUrl' => url('/')]);
+                $processor->purchase(['payment_method' => $paymentMethodId, 'return_url' => url('/')]);
             } catch (PaymentException $ex) {
                 $this->assertInstanceOf($expectedException, $ex);
             }

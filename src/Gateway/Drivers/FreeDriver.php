@@ -2,16 +2,16 @@
 
 namespace EscolaLms\Payments\Gateway\Drivers;
 
-use EscolaLms\Payments\Dtos\PaymentDto;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
 use EscolaLms\Payments\Gateway\Responses\CallbackResponse;
 use EscolaLms\Payments\Gateway\Responses\NoneGatewayResponse;
+use EscolaLms\Payments\Models\Payment;
 use Illuminate\Http\Request;
 use Omnipay\Common\Message\ResponseInterface;
 
 class FreeDriver extends AbstractDriver implements GatewayDriverContract
 {
-    public function purchase(PaymentDto $dto, array $parameters = []): ResponseInterface
+    public function purchase(Payment $payment, array $parameters = []): ResponseInterface
     {
         return new NoneGatewayResponse();
     }
