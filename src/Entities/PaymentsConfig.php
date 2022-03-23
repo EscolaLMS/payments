@@ -33,7 +33,7 @@ class PaymentsConfig
 
     public function getStripeSecretKey(): ?string
     {
-        return $this->config['drivers']['stripe']['secret_key'];
+        return $this->config['drivers']['stripe']['secret_key'] ?? null;
     }
 
     public function getStripePublishableKey(): ?string
