@@ -21,7 +21,7 @@ class FreeDriver extends AbstractDriver implements GatewayDriverContract
         return new CallbackResponse();
     }
 
-    public function requiredParameters(): array
+    public static function requiredParameters(): array
     {
         return [];
     }

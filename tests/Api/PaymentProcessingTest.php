@@ -95,6 +95,34 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         ]);
     }
 
+    public function testPayableCanBecomePaymentAndWillRequireRedirectUsingPrzelewy24()
+    {
+        $this->markTestSkipped(
+            'This test calls external (Przelewy24) api, we probably should not run it automatically every time we run test suite'
+        );
+
+        Event::fake([PaymentRegistered::class]);
+        $billable = $this->createBillableStudent();
+        $payable = new Payable(1000, Currency::USD(), 'asdf', 1337);
+        $payable->setUser($billable);
+
+        $processor = $payable->process()->setPaymentDriverName('przelewy24');
+        Event::assertDispatched(PaymentRegistered::class);
+        $payment = $processor->getPayment();
+        $this->assertEquals(PaymentStatus::NEW(), $payment->status);
+
+        $processor->purchase(['return_url' => url('/'), 'email' => $billable->email]);
+        $payment->refresh();
+
+        $this->assertEquals(PaymentStatus::REQUIRES_REDIRECT(), $payment->status);
+
+        $response = $this->actingAs($billable)->json('GET', 'api/payments/');
+        $response->assertOk();
+        $response->assertJsonFragment([
+            'id' => $payment->getKey()
+        ]);
+    }
+
     public function testPaymentShouldFailAndThrowExceptionUsingStripe()
     {
         $this->markTestSkipped(

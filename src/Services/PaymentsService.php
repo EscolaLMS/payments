@@ -12,6 +12,8 @@ use EscolaLms\Payments\Models\Payment;
 use EscolaLms\Payments\Repositories\Contracts\PaymentsRepositoryContract;
 use EscolaLms\Payments\Services\Contracts\PaymentsServiceContract;
 use EscolaLms\Payments\Entities\PaymentProcessor;
+use EscolaLms\Payments\Gateway\Drivers\Przelewy24Driver;
+use EscolaLms\Payments\Gateway\Drivers\StripeDriver;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -74,5 +76,17 @@ class PaymentsService implements PaymentsServiceContract
     public function dispatchRegisterPaymentEvent(Authenticatable $user, Payment $payment)
     {
         event(new PaymentRegistered($user, $payment));
+    }
+
+    public function listGatewaysWithRequiredParameters(): array
+    {
+        $config = [];
+        if ($this->getPaymentsConfig()->isStripeEnabled()) {
+            $config['stripe'] = StripeDriver::requiredParameters();
+        }
+        if ($this->getPaymentsConfig()->isPrzelewy24Enabled()) {
+            $config['przelewy24'] = Przelewy24Driver::requiredParameters();
+        }
+        return $config;
     }
 }

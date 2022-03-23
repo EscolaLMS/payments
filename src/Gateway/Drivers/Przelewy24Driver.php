@@ -69,7 +69,7 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
         }
     }
 
-    public function requiredParameters(): array
+    public static function requiredParameters(): array
     {
         return [
             'return_url',

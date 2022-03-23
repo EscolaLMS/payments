@@ -26,12 +26,17 @@ class PaymentsConfig
         return Currency::USD();
     }
 
-    public function getStripeSecretKey(): string
+    public function isStripeEnabled(): bool
+    {
+        return $this->config['drivers']['stripe']['enabled'] ?? false;
+    }
+
+    public function getStripeSecretKey(): ?string
     {
         return $this->config['drivers']['stripe']['secret_key'];
     }
 
-    public function getStripePublishableKey(): string
+    public function getStripePublishableKey(): ?string
     {
         return $this->config['drivers']['stripe']['publishable_key'];
     }
@@ -41,28 +46,48 @@ class PaymentsConfig
         return $this->config['drivers']['stripe']['allowed_payment_method_types'] ?? ['card', 'p24'];
     }
 
-    public function getPrzelewy24Live(): bool {
-        return $this->config['drivers']['przelewy24']['live'];
+    public function hasValidConfigForStripe(): bool
+    {
+        return !is_null($this->getStripeSecretKey())
+            && !is_null($this->getStripePublishableKey());
     }
 
-    public function getPrzelewy24MerchantId(): string
+    public function isPrzelewy24Enabled(): bool
+    {
+        return $this->config['drivers']['przelewy24']['enabled'] ?? false;
+    }
+
+    public function getPrzelewy24Live(): bool
+    {
+        return $this->config['drivers']['przelewy24']['live'] ?? true;
+    }
+
+    public function getPrzelewy24MerchantId(): ?string
     {
         return $this->config['drivers']['przelewy24']['merchant_id'];
     }
 
-    public function getPrzelewy24PosId(): string
+    public function getPrzelewy24PosId(): ?string
     {
         return $this->config['drivers']['przelewy24']['pos_id'] ?? $this->getPrzelewy24MerchantId();
     }
 
-    public function getPrzelewy24ApiKey(): string
+    public function getPrzelewy24ApiKey(): ?string
     {
         return $this->config['drivers']['przelewy24']['api_key'];
     }
 
-    public function getPrzelewy24Crc(): string
+    public function getPrzelewy24Crc(): ?string
     {
         return $this->config['drivers']['przelewy24']['crc'];
+    }
+
+    public function hasValidConfigForPrzelewy24(): bool
+    {
+        return !is_null($this->getPrzelewy24MerchantId())
+            && !is_null($this->getPrzelewy24PosId())
+            && !is_null($this->getPrzelewy24ApiKey())
+            && !is_null($this->getPrzelewy24Crc());
     }
 
     public function shouldThrowOnPaymentError(): bool

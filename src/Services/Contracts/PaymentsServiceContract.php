@@ -14,6 +14,9 @@ use Illuminate\Support\Collection;
 interface PaymentsServiceContract
 {
     public function getPaymentsConfig(): PaymentsConfig;
+
+    public function listGatewaysWithRequiredParameters(): array;
+
     public function processPayable(Payable $payable): PaymentProcessor;
     public function processPayment(Payment $payment): PaymentProcessor;
     public function searchPayments(CriteriaDto $criteriaDto, OrderDto $orderDto): LengthAwarePaginator;

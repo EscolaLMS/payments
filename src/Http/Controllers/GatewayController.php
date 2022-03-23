@@ -7,7 +7,7 @@ use EscolaLms\Payments\Services\Contracts\PaymentsServiceContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class CallbackController extends EscolaLmsBaseController
+class GatewayController extends EscolaLmsBaseController
 {
     private PaymentsServiceContract $paymentService;
 
@@ -17,6 +17,11 @@ class CallbackController extends EscolaLmsBaseController
     }
 
     public function index(Request $request)
+    {
+        return $this->sendResponse($this->paymentService->listGatewaysWithRequiredParameters(), __('List of payment gateways with required parameters'));
+    }
+
+    public function callback(Request $request)
     {
         $payment = $this->paymentService->findPayment((int) $request->route('payment'));
         if (is_null($payment)) {

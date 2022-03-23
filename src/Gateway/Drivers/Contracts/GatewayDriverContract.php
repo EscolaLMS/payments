@@ -12,7 +12,7 @@ interface GatewayDriverContract
     public function purchase(Payment $payment, array $parameters = []): ResponseInterface;
     public function callback(Request $request, array $parameters = []): CallbackResponse;
 
-    public function requiredParameters(): array;
+    public static function requiredParameters(): array;
 
     public function throwExceptionForResponse(ResponseInterface $response): void;
     public function throwExceptionIfMissingParameters(array $parameters): void;
