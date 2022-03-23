@@ -43,7 +43,7 @@ class PaymentsConfig
 
     public function getStripeAllowedPaymentMethodTypes(): array
     {
-        return $this->config['drivers']['stripe']['allowed_payment_method_types'] ?? ['card', 'p24'];
+        return $this->config['drivers']['stripe']['allowed_payment_method_types'] ?? ['card'];
     }
 
     public function hasValidConfigForStripe(): bool
