@@ -74,7 +74,7 @@ class PaymentsConfig
 
     public function getPrzelewy24ApiKey(): ?string
     {
-        return $this->config['drivers']['przelewy24']['api_key'];
+        return $this->config['drivers']['przelewy24']['api_key'] ?? null;
     }
 
     public function getPrzelewy24Crc(): ?string
