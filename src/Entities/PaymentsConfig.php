@@ -79,7 +79,7 @@ class PaymentsConfig
 
     public function getPrzelewy24Crc(): ?string
     {
-        return $this->config['drivers']['przelewy24']['crc'];
+        return $this->config['drivers']['przelewy24']['crc'] ?? null;
     }
 
     public function hasValidConfigForPrzelewy24(): bool
