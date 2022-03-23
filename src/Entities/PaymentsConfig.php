@@ -64,7 +64,7 @@ class PaymentsConfig
 
     public function getPrzelewy24MerchantId(): ?string
     {
-        return $this->config['drivers']['przelewy24']['merchant_id'];
+        return $this->config['drivers']['przelewy24']['merchant_id'] ?? null;
     }
 
     public function getPrzelewy24PosId(): ?string
