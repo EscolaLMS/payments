@@ -163,6 +163,16 @@ class PaymentProcessor
         return $this->getPayment()->status->is(PaymentStatus::PAID);
     }
 
+    public function isRedirect(): bool
+    {
+        return $this->getPayment()->status->is(PaymentStatus::REQUIRES_REDIRECT());
+    }
+
+    public function getRedirectUrl(): string
+    {
+        return $this->getPayment()->redirect_url;
+    }
+
     public function isCancelled(): bool
     {
         return $this->getPayment()->status->is(PaymentStatus::CANCELLED);

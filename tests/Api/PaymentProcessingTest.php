@@ -58,6 +58,11 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
 
         $this->assertEquals(PaymentStatus::PAID(), $payment->status);
 
+        $this->assertTrue($processor->isSuccessful());
+        $this->assertFalse($processor->isCancelled());
+        $this->assertFalse($processor->isRedirect());
+        $this->assertFalse($processor->isNew());
+
         $response = $this->actingAs($billable)->json('GET', 'api/payments/');
         $response->assertOk();
         $response->assertJsonFragment([
