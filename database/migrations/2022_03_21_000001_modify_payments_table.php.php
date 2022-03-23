@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 class ModifyPaymentsTable extends EscolaMigration
 {
-    public function up()
+    public function up(): void
     {
         Schema::table('payments', function (Blueprint $table) {
             $table->string('driver')->nullable();
@@ -15,7 +15,7 @@ class ModifyPaymentsTable extends EscolaMigration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::table('payments', function (Blueprint $table) {
             $table->dropColumn('driver');

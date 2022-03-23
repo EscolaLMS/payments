@@ -6,14 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 class AddRedirectUrlToPaymentsTable extends EscolaMigration
 {
-    public function up()
+    public function up(): void
     {
         Schema::table('payments', function (Blueprint $table) {
             $table->string('redirect_url')->nullable();
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::table('payments', function (Blueprint $table) {
             $table->dropColumn('redirect_url');

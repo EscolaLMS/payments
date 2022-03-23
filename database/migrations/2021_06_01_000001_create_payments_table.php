@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 
 class CreatePaymentsTable extends EscolaMigration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id('id');
@@ -23,7 +23,7 @@ class CreatePaymentsTable extends EscolaMigration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('payments');
     }
