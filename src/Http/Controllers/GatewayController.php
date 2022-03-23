@@ -4,6 +4,7 @@ namespace EscolaLms\Payments\Http\Controllers;
 
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
 use EscolaLms\Payments\Services\Contracts\PaymentsServiceContract;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -16,12 +17,12 @@ class GatewayController extends EscolaLmsBaseController
         $this->paymentService = $paymentService;
     }
 
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         return $this->sendResponse($this->paymentService->listGatewaysWithRequiredParameters(), __('List of payment gateways with required parameters'));
     }
 
-    public function callback(Request $request)
+    public function callback(Request $request): JsonResponse
     {
         $payment = $this->paymentService->findPayment((int) $request->route('payment'));
         if (is_null($payment)) {
