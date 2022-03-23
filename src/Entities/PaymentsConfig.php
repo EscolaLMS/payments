@@ -38,7 +38,7 @@ class PaymentsConfig
 
     public function getStripePublishableKey(): ?string
     {
-        return $this->config['drivers']['stripe']['publishable_key'];
+        return $this->config['drivers']['stripe']['publishable_key'] ?? null;
     }
 
     public function getStripeAllowedPaymentMethodTypes(): array
