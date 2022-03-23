@@ -25,7 +25,7 @@
                                 "updated_at",
                                 "status",
                                 "payable_id",
-                                "billable_id",
+                                "user_id",
                                 "amount",
                                 "order_id",
                                 "id"
@@ -106,21 +106,12 @@
                         }
                     },
                     {
-                        "name": "billable_id",
+                        "name": "user_id",
                         "in": "query",
-                        "description": "Id of billable (e.g. user id, if no other billable class is used you can ignore billable_type)",
+                        "description": "Id of user",
                         "required": false,
                         "schema": {
                             "type": "number"
-                        }
-                    },
-                    {
-                        "name": "billable_type",
-                        "in": "query",
-                        "description": "Full classname of billable model (eg. EscolaLms\\Core\\Models\\User)",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
                         }
                     },
                     {
@@ -213,7 +204,7 @@
                                 "updated_at",
                                 "status",
                                 "payable_id",
-                                "billable_id",
+                                "user_id",
                                 "amount",
                                 "order_id",
                                 "id"
@@ -401,13 +392,9 @@
                         "description": "payable_type",
                         "type": "string"
                     },
-                    "billable_id": {
-                        "description": "billable_id",
+                    "user_id": {
+                        "description": "user_id",
                         "type": "integer"
-                    },
-                    "billable_type": {
-                        "description": "billable_type",
-                        "type": "string"
                     }
                 },
                 "type": "object"
