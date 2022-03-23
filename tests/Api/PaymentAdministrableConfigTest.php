@@ -34,8 +34,12 @@ class PaymentAdministrableConfigTest extends TestCase
         $this->user->assignRole('admin');
 
         Config::set('escola_settings.use_database', true);
-        Config::set('escolalms_payments.drivers.stripe.key', 'key_value');
+        Config::set('escolalms_payments.drivers.stripe.secret_key', 'key_value');
         Config::set('escolalms_payments.drivers.stripe.publishable_key', 'publishable_key_value');
+        Config::set('escolalms_payments.drivers.przelewy24.merchant_id', 'merchant_id_value');
+        Config::set('escolalms_payments.drivers.przelewy24.pos_id', 'pos_id_value');
+        Config::set('escolalms_payments.drivers.przelewy24.api_key', 'api_key_value');
+        Config::set('escolalms_payments.drivers.przelewy24.crc', 'crc_value');
     }
 
     public function test_payment_administrable_config()
@@ -49,12 +53,21 @@ class PaymentAdministrableConfigTest extends TestCase
             'escolalms_payments' => [
                 'drivers' => [
                     'stripe' => [
-                        'key' => 'key_value',
-                        'publishable_key' => 'publishable_key_value'
-                    ]
+                        'enabled' => true,
+                        'secret_key' => 'key_value',
+                        'publishable_key' => 'publishable_key_value',
+                    ],
+                    'przelewy24' => [
+                        'enabled' => true,
+                        'live' => true,
+                        'merchant_id' => 'merchant_id_value',
+                        'pos_id' => 'pos_id_value',
+                        'api_key' => 'api_key_value',
+                        'crc' => 'crc_value',
+                    ],
                 ],
                 'default_gateway' => 'Stripe',
-                'default_currency' => Currency::USD
+                'default_currency' => Currency::USD,
             ]
         ]);
     }

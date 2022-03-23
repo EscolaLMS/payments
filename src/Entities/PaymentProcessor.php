@@ -2,27 +2,22 @@
 
 namespace EscolaLms\Payments\Entities;
 
-use EscolaLms\Payments\Contracts\Billable;
-use EscolaLms\Payments\Dtos\Contracts\PaymentMethodContract;
-use EscolaLms\Payments\Dtos\PaymentDto;
+use EscolaLms\Core\Models\User;
 use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Events\PaymentCancelled;
 use EscolaLms\Payments\Events\PaymentFailed;
+use EscolaLms\Payments\Events\PaymentRequiresRedirect;
 use EscolaLms\Payments\Events\PaymentSuccess;
-use EscolaLms\Payments\Exceptions\PaymentException;
-use EscolaLms\Payments\Exceptions\RedirectException;
 use EscolaLms\Payments\Facades\PaymentGateway;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
 use EscolaLms\Payments\Models\Payment;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Omnipay\Common\Message\RedirectResponseInterface;
-use Omnipay\Common\Message\ResponseInterface;
 
 class PaymentProcessor
 {
     private Payment $payment;
-    private ?string $driver = null;
 
     public function __construct(Payment $payment)
     {
@@ -46,11 +41,9 @@ class PaymentProcessor
         return $this;
     }
 
-    public function setBillable(Billable $billable): self
+    public function setUser(User $user): self
     {
-        if ($billable instanceof Model) {
-            $this->payment->billable()->associate($billable);
-        }
+        $this->payment->user()->associate($user);
         return $this;
     }
 
@@ -66,31 +59,47 @@ class PaymentProcessor
         return $this;
     }
 
+    public function setGatewayOrderId(?string $gatewayOrderId): self
+    {
+        $this->payment->gateway_order_id = $gatewayOrderId;
+        return $this;
+    }
+
+    public function setPaymentDriverName(?string $driver): self
+    {
+        $this->payment->driver = $driver ?? PaymentGateway::getDefaultDriver();
+        return $this;
+    }
+
+    public function getPaymentDriverName(): string
+    {
+        if ($this->payment->amount === 0) {
+            return 'free';
+        }
+        return $this->payment->driver ?? PaymentGateway::getDefaultDriver();
+    }
+
     public function savePayment(): self
     {
         $this->payment->save();
         return $this;
     }
 
-    /**
-     * Pay for payment that is being processed
-     *
-     * @throws RedirectException|PaymentException
-     */
-    public function purchase(PaymentMethodContract $method): self
+    public function purchase(array $parameters = []): self
     {
+        $this->setPaymentDriverName($this->getPaymentDriverName());
         $this->savePayment();
-        $dto = PaymentDto::instantiateFromPayment($this->payment);
-        $response = $this->getPaymentDriver()->purchase($dto, $method);
+
+        $response = $this->getPaymentDriver()->purchase($this->payment, $parameters);
         if ($response->isSuccessful()) {
-            $this->setSuccessful($response);
+            $this->setSuccessful();
         } elseif ($response->isRedirect()) {
             assert($response instanceof RedirectResponseInterface);
-            throw new RedirectException($response);
+            $this->setRedirect($response->getRedirectUrl());
         } elseif ($response->isCancelled()) {
-            $this->setCancelled($response);
+            $this->setCancelled();
         } else {
-            $this->setError($response);
+            $this->setError($response->getMessage(), $response->getCode());
             if (PaymentGateway::getPaymentsConfig()->shouldThrowOnPaymentError()) {
                 $this->getPaymentDriver()->throwExceptionForResponse($response);
             }
@@ -99,22 +108,49 @@ class PaymentProcessor
         return $this;
     }
 
-    private function setSuccessful(ResponseInterface $response): void
+    public function callback(Request $request): self
+    {
+        $callbackResponse = $this->getPaymentDriver()->callback($request);
+
+        $this->clearRedirect();
+        $this->setGatewayOrderId($callbackResponse->getGatewayOrderId());
+
+        if ($callbackResponse->getSuccess()) {
+            $this->setSuccessful();
+        } else {
+            $this->setError($callbackResponse->getError());
+        }
+
+        return $this;
+    }
+
+    private function setSuccessful(): void
     {
         $this->setPaymentStatus(PaymentStatus::PAID());
-        event(new PaymentSuccess($this->payment->billable, $this->payment));
+        event(new PaymentSuccess($this->payment->user, $this->payment));
     }
 
-    private function setCancelled(ResponseInterface $response): void
+    private function clearRedirect(): void
+    {
+        $this->payment->redirect_url = null;
+    }
+
+    private function setRedirect(string $redirect_url): void
+    {
+        $this->payment->redirect_url = $redirect_url;
+        $this->setPaymentStatus(PaymentStatus::REQUIRES_REDIRECT());
+    }
+
+    private function setCancelled(): void
     {
         $this->setPaymentStatus(PaymentStatus::CANCELLED());
-        event(new PaymentCancelled($this->payment->billable, $this->payment));
+        event(new PaymentCancelled($this->payment->user, $this->payment));
     }
 
-    private function setError(ResponseInterface $response): void
+    private function setError(string $message, string $code = '0'): void
     {
         $this->setPaymentStatus(PaymentStatus::FAILED());
-        event(new PaymentFailed($this->payment->billable, $this->payment, $response->getCode(), $response->getMessage()));
+        event(new PaymentFailed($this->payment->user, $this->payment, $code, $message));
     }
 
     public function isNew(): bool
@@ -125,6 +161,16 @@ class PaymentProcessor
     public function isSuccessful(): bool
     {
         return $this->getPayment()->status->is(PaymentStatus::PAID);
+    }
+
+    public function isRedirect(): bool
+    {
+        return $this->getPayment()->status->is(PaymentStatus::REQUIRES_REDIRECT());
+    }
+
+    public function getRedirectUrl(): string
+    {
+        return $this->getPayment()->redirect_url;
     }
 
     public function isCancelled(): bool
@@ -138,20 +184,8 @@ class PaymentProcessor
         return $this->payment->save();
     }
 
-    public function setPaymentDriver(?string $driver): self
-    {
-        $this->driver = $driver;
-        return $this;
-    }
-
     protected function getPaymentDriver(): GatewayDriverContract
     {
-        if ($this->payment->amount === 0) {
-            $driver = 'free';
-        } else {
-            $driver = $this->driver;
-        }
-
-        return PaymentGateway::driver($driver);
+        return PaymentGateway::driver($this->getPaymentDriverName());
     }
 }

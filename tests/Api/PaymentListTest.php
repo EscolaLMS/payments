@@ -19,13 +19,11 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
     {
         $billable = $this->createBillableStudent();
         $payments = Payment::factory()->count(20)->create([
-            'billable_id' => $billable->getKey(),
-            'billable_type' => $billable->getMorphClass(),
+            'user_id' => $billable->getKey(),
         ]);
         $billable2 = $this->createBillableStudent();
         $payments2 = Payment::factory()->count(20)->create([
-            'billable_id' => $billable2->getKey(),
-            'billable_type' => $billable2->getMorphClass(),
+            'user_id' => $billable2->getKey(),
         ]);
 
         /** @var TestResponse $response */
@@ -49,20 +47,18 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
 
         $billable = $this->createBillableStudent();
         $payments = Payment::factory()->count(10)->create([
-            'billable_id' => $billable->getKey(),
-            'billable_type' => $billable->getMorphClass(),
+            'user_id' => $billable->getKey(),
         ]);
         $billable2 = $this->createBillableStudent();
         $payments2 = Payment::factory()->count(10)->create([
-            'billable_id' => $billable2->getKey(),
-            'billable_type' => $billable2->getMorphClass(),
+            'user_id' => $billable2->getKey(),
         ]);
 
         $admin = $this->makeAdmin();
         $admin->save();
 
         /** @var TestResponse $response */
-        $response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
+        $response = $this->actingAs($admin, 'api')->json('GET', 'api/admin/payments/', [
             'per_page' => 20
         ]);
         $response->assertOk();
@@ -87,13 +83,11 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
 
         $billable = $this->createBillableStudent();
         $paymentsNew = Payment::factory()->count(5)->create([
-            'billable_id' => $billable->getKey(),
-            'billable_type' => $billable->getMorphClass(),
+            'user_id' => $billable->getKey(),
             'status' => PaymentStatus::NEW,
         ]);
         $paymentsPaid = Payment::factory()->count(5)->create([
-            'billable_id' => $billable->getKey(),
-            'billable_type' => $billable->getMorphClass(),
+            'user_id' => $billable->getKey(),
             'status' => PaymentStatus::PAID,
         ]);
 
@@ -101,7 +95,7 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         $admin->save();
 
         /** @var TestResponse $response */
-        $response = $this->actingAs($admin)->json('GET', 'api/admin/payments/');
+        $response = $this->actingAs($admin, 'api')->json('GET', 'api/admin/payments/');
         $response->assertOk();
         $response->assertJsonFragment([
             'id' => $paymentsNew[0]->getKey()
@@ -114,7 +108,7 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         // $this->assertCountWithOrWithoutWrapper($response, 10, PaymentResource::$wrap);
 
         /** @var TestResponse $response */
-        $response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
+        $response = $this->actingAs($admin, 'api')->json('GET', 'api/admin/payments/', [
             'status' => PaymentStatus::PAID,
         ]);
         $response->assertOk();
@@ -131,7 +125,7 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         // $this->assertCountWithOrWithoutWrapper($response, 5, PaymentResource::$wrap);
 
         /** @var TestResponse */
-        $response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
+        $response = $this->actingAs($admin, 'api')->json('GET', 'api/admin/payments/', [
             'date_from' => Carbon::now()->addDay()->toIso8601String(),
         ]);
         $response->assertOk();
@@ -140,7 +134,7 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         // $this->assertCountWithOrWithoutWrapper($response, 0, PaymentResource::$wrap);
 
         /** @var TestResponse */
-        $response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
+        $response = $this->actingAs($admin, 'api')->json('GET', 'api/admin/payments/', [
             'date_to' => Carbon::now()->subDay()->toIso8601String(),
         ]);
         $response->assertOk();
@@ -149,7 +143,7 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         // $this->assertCountWithOrWithoutWrapper($response, 0, PaymentResource::$wrap);
 
         /** @var TestResponse */
-        $response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
+        $response = $this->actingAs($admin, 'api')->json('GET', 'api/admin/payments/', [
             'date_from' => Carbon::now()->subDay()->toIso8601String(),
             'date_to' => Carbon::now()->addDay()->toIso8601String(),
         ]);
@@ -159,7 +153,7 @@ class PaymentListTest extends \EscolaLms\Payments\Tests\TestCase
         // $this->assertCountWithOrWithoutWrapper($response, 10, PaymentResource::$wrap);
 
         /** @var TestResponse $response */
-        $response = $this->actingAs($admin)->json('GET', 'api/admin/payments/', [
+        $response = $this->actingAs($admin, 'api')->json('GET', 'api/admin/payments/', [
             'order_id' => $paymentsNew[0]->order_id,
         ]);
         $response->assertOk();

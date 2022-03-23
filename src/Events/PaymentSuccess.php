@@ -2,6 +2,6 @@
 
 namespace EscolaLms\Payments\Events;
 
-class PaymentSuccess extends Payment
+class PaymentSuccess extends PaymentEvent
 {
 }

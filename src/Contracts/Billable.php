@@ -2,12 +2,12 @@
 
 namespace EscolaLms\Payments\Contracts;
 
-use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property-read \Illuminate\Support\Collection $payments
  */
 interface Billable
 {
-    public function payments(): MorphMany;
+    public function payments(): HasMany;
 }

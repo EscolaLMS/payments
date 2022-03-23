@@ -20,11 +20,8 @@ class PaymentFilterCriteriaDto extends CriteriaDto implements InstantiateFromReq
         if ($request->has('status')) {
             $criteria->push(new EqualCriterion('status', $request->input('status')));
         }
-        if ($request->has('billable_id')) {
-            $criteria->push(new EqualCriterion('billable_id', $request->input('billable_id')));
-        }
-        if ($request->has('billable_type')) {
-            $criteria->push(new EqualCriterion('billable_type', $request->input('billable_type')));
+        if ($request->has('user_id')) {
+            $criteria->push(new EqualCriterion('user_id', $request->input('user_id')));
         }
         if ($request->has('payable_id')) {
             $criteria->push(new EqualCriterion('payable_id', $request->input('payable_id')));

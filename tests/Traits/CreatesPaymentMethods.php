@@ -12,7 +12,7 @@ trait CreatesPaymentMethods
     protected function getGateway()
     {
         $this->gateway = Omnipay::create('Stripe\PaymentIntents');
-        $this->gateway->setApiKey(Payments::getPaymentsConfig()->getStripeApiKey());
+        $this->gateway->setApiKey(Payments::getPaymentsConfig()->getStripeSecretKey());
         return $this->gateway;
     }
 

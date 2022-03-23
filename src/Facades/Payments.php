@@ -13,10 +13,15 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static PaymentsConfig getPaymentsConfig()
+ * 
+ * @method static array listEnabledGateways()
+ * @method static array listGatewaysWithRequiredParameters()
+ * 
  * @method static PaymentProcessor processPayable(Payable $payable)
  * @method static PaymentProcessor processPayment(Payment $payment)
  * @method static Collection searchPayments(CriteriaDto $criteriaDto, OrderDto $orderDto)
- * @method static Collection listPaymentsForBillable(int $billable_id, string|null $billable_type = null)
+ * @method static Collection listPaymentsForUser(int $user_id)
+ * @method static Payment findPayment(int $id)
  *
  * @see \EscolaLms\Payments\Services\PaymentsService
  */

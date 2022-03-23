@@ -24,7 +24,7 @@ interface PaymentsSwagger
      *          in="query",
      *          @OA\Schema(
      *              type="string",
-     *              enum={"created_at", "updated_at", "status", "payable_id", "billable_id", "amount", "order_id", "id"}
+     *              enum={"created_at", "updated_at", "status", "payable_id", "user_id", "amount", "order_id", "id"}
      *          ),
      *      ),
      *      @OA\Parameter(
@@ -94,21 +94,12 @@ interface PaymentsSwagger
      *          ),
      *      ),
      *      @OA\Parameter(
-     *          name="billable_id",
-     *          description="Id of billable (e.g. user id, if no other billable class is used you can ignore billable_type)",
+     *          name="user_id",
+     *          description="Id of user",
      *          required=false,
      *          in="query",
      *          @OA\Schema(
      *              type="number",
-     *          ),
-     *      ),
-     *      @OA\Parameter(
-     *          name="billable_type",
-     *          description="Full classname of billable model (eg. EscolaLms\Core\Models\User)",
-     *          required=false,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="string",
      *          ),
      *      ),
      *      @OA\Parameter(

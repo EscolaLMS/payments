@@ -5,7 +5,7 @@ namespace EscolaLms\Payments\Repositories;
 use EscolaLms\Core\Dtos\CriteriaDto;
 use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Core\Repositories\BaseRepository;
-use EscolaLms\Payments\Facades\Payments;
+use EscolaLms\Payments\Models\Payment;
 use EscolaLms\Payments\Repositories\Contracts\PaymentsRepositoryContract;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -14,7 +14,7 @@ class PaymentsRepository extends BaseRepository implements PaymentsRepositoryCon
     public function getFieldsSearchable()
     {
         return [
-            'billable_id',
+            'user_id',
             'payable_id',
             'status',
         ];
@@ -22,7 +22,7 @@ class PaymentsRepository extends BaseRepository implements PaymentsRepositoryCon
 
     public function model()
     {
-        return Payments::getPaymentsConfig()->getPaymentModel();
+        return Payment::class;
     }
 
     public function searchAndOrder(?CriteriaDto $criteriaDto, ?OrderDto $orderDto): Builder

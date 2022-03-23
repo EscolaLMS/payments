@@ -3,14 +3,16 @@
 namespace EscolaLms\Payments\Gateway;
 
 use EscolaLms\Payments\Entities\PaymentsConfig;
+use EscolaLms\Payments\Exceptions\GatewayConfigException;
 use EscolaLms\Payments\Gateway\Drivers\FreeDriver;
+use EscolaLms\Payments\Gateway\Drivers\Przelewy24Driver;
 use EscolaLms\Payments\Gateway\Drivers\StripeDriver;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Manager;
 
 class GatewayManager extends Manager
 {
-    private PaymentsConfig $paymentsConfig;
+    protected PaymentsConfig $paymentsConfig;
 
     public function __construct(Container $container)
     {
@@ -35,6 +37,23 @@ class GatewayManager extends Manager
 
     public function createStripeDriver(): StripeDriver
     {
+        if (!$this->paymentsConfig->isStripeEnabled()) {
+            throw new GatewayConfigException(__('Stripe payments gateway is disabled'));
+        }
+        if (!$this->paymentsConfig->hasValidConfigForStripe()) {
+            throw new GatewayConfigException(__('Missing Stripe configuration'));
+        }
         return new StripeDriver($this->paymentsConfig);
+    }
+
+    public function createPrzelewy24Driver(): Przelewy24Driver
+    {
+        if (!$this->paymentsConfig->isPrzelewy24Enabled()) {
+            throw new GatewayConfigException(__('Przelewy24 payments gateway is disabled'));
+        }
+        if (!$this->paymentsConfig->hasValidConfigForPrzelewy24()) {
+            throw new GatewayConfigException(__('Missing Przelewy24 configuration'));
+        }
+        return new Przelewy24Driver($this->paymentsConfig);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace EscolaLms\Payments\Tests\Mocks;
 
+use EscolaLms\Core\Models\User;
 use EscolaLms\Payments\Concerns\Payable as ConcernsPayable;
-use EscolaLms\Payments\Contracts\Billable;
 use EscolaLms\Payments\Contracts\Payable as ContractsPayable;
 use EscolaLms\Payments\Enums\Currency;
 use Illuminate\Support\Collection;
@@ -12,7 +12,7 @@ class Payable implements ContractsPayable
 {
     use ConcernsPayable;
 
-    private ?Billable $billable = null;
+    private ?User $user = null;
     private ?Currency $currency;
     private ?string $order_id;
     private Collection $payments;
@@ -48,14 +48,14 @@ class Payable implements ContractsPayable
         return $this->order_id;
     }
 
-    public function getBillable(): ?Billable
+    public function getUser(): ?User
     {
-        return $this->billable;
+        return $this->user;
     }
 
-    public function setBillable(?Billable $billable): self
+    public function setUser(?User $user): self
     {
-        $this->billable = $billable;
+        $this->user = $user;
         return $this;
     }
 

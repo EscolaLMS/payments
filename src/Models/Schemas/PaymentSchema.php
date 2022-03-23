@@ -42,18 +42,12 @@ namespace EscolaLms\Payments\Models\Schemas;
  *          type="string"
  *      ),
  *      @OA\Property(
- *          property="billable_id",
- *          description="billable_id",
+ *          property="user_id",
+ *          description="user_id",
  *          type="integer"
- *      ),
- *      @OA\Property(
- *          property="billable_type",
- *          description="billable_type",
- *          type="string"
  *      ),
  * )
  */
-
 interface PaymentSchema
 {
 }
