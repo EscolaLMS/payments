@@ -1,6 +1,6 @@
 <?php
 
-namespace EscolaLms\Payments\Tests\APIs;
+namespace EscolaLms\Payments\Tests\Api;
 
 use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Payments\Enums\Currency;
