@@ -41,7 +41,7 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
                 'currency' => (string) ($payment->currency ?? $this->config->getDefaultCurrency()),
                 'description' => $payment->description,
                 'url_return' => $parameters['return_url'],
-                'url_status' => route('payments-gateway-callback') . '/' . $payment->getKey(),
+                'url_status' => route('payments-gateway-callback', ['payment' => $payment->getKey()]),
                 'email' => $parameters['email'],
                 'session_id' => ($payment->order_id ? $payment->order_id . '_' : '') . $payment->getKey(),
             ]);
