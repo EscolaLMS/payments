@@ -10,6 +10,7 @@ use EscolaLms\Payments\Events\PaymentFailed;
 use EscolaLms\Payments\Events\PaymentRequiresRedirect;
 use EscolaLms\Payments\Events\PaymentSuccess;
 use EscolaLms\Payments\Facades\PaymentGateway;
+use EscolaLms\Payments\Facades\Payments;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
 use EscolaLms\Payments\Models\Payment;
 use Illuminate\Http\Request;
@@ -87,7 +88,13 @@ class PaymentProcessor
 
     public function purchase(array $parameters = []): self
     {
-        $this->setPaymentDriverName($this->getPaymentDriverName());
+        $driver = $parameters['gateway'] ?? null;
+        if (!is_null($driver) && Payments::isDriverEnabled($driver)) {
+            $this->setPaymentDriverName($driver);
+        } else {
+            $this->setPaymentDriverName($this->getPaymentDriverName());
+        }
+
         $this->savePayment();
 
         $response = $this->getPaymentDriver()->purchase($this->payment, $parameters);

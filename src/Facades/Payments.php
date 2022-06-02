@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Facade;
  * 
  * @method static array listEnabledGateways()
  * @method static array listGatewaysWithRequiredParameters()
+ * @method static bool isDriverEnabled(string $driver)
  * 
  * @method static PaymentProcessor processPayable(Payable $payable)
  * @method static PaymentProcessor processPayment(Payment $payment)

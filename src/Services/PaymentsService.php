@@ -102,4 +102,9 @@ class PaymentsService implements PaymentsServiceContract
             ]
         ];
     }
+
+    public function isDriverEnabled(string $driver): bool
+    {
+        return array_key_exists($driver, $this->listEnabledGateways());
+    }
 }
