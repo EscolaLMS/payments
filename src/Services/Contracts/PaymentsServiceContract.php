@@ -17,6 +17,7 @@ interface PaymentsServiceContract
 
     public function listEnabledGateways(): array;
     public function listGatewaysWithRequiredParameters(): array;
+    public function isDriverEnabled(string $driver): bool;
 
     public function processPayable(Payable $payable): PaymentProcessor;
     public function processPayment(Payment $payment): PaymentProcessor;

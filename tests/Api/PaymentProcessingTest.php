@@ -15,6 +15,7 @@ use EscolaLms\Payments\Facades\PaymentGateway;
 use EscolaLms\Payments\Tests\Mocks\Payable;
 use EscolaLms\Payments\Tests\Traits\CreatesBillable;
 use EscolaLms\Payments\Tests\Traits\CreatesPaymentMethods;
+use Exception;
 use Illuminate\Support\Facades\Event;
 
 class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
@@ -39,7 +40,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         $this->assertEquals($payable->getUser()->getKey(), $payment->user->getKey());
     }
 
-    public function testPayableCanBecomePaymentAndBePaid()
+    public function testPayableCanBecomePaymentAndBePaidUsingMockedStripe()
     {
         PaymentGateway::fake();
 
@@ -53,7 +54,51 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         $payment = $processor->getPayment();
         $this->assertEquals(PaymentStatus::NEW(), $payment->status);
 
-        $processor->purchase();
+
+        try {
+            $processor->purchase(['gateway' => 'stripe']);
+        } catch (Exception $ex) {
+            $this->assertEquals('Missing Payment Gateway parameters: return_url, payment_method', $ex->getMessage());
+        }
+
+        $processor->purchase(['gateway' => 'stripe', 'return_url' => 'https://localhost.test', 'payment_method' => '123']);
+        $payment->refresh();
+
+        $this->assertEquals(PaymentStatus::PAID(), $payment->status);
+
+        $this->assertTrue($processor->isSuccessful());
+        $this->assertFalse($processor->isCancelled());
+        $this->assertFalse($processor->isRedirect());
+        $this->assertFalse($processor->isNew());
+
+        $response = $this->actingAs($billable)->json('GET', 'api/payments/');
+        $response->assertOk();
+        $response->assertJsonFragment([
+            'id' => $payment->getKey()
+        ]);
+    }
+
+    public function testPayableCanBecomePaymentAndBePaidUsingMockedP24()
+    {
+        PaymentGateway::fake();
+
+        Event::fake([PaymentRegistered::class]);
+        $billable = $this->createBillableStudent();
+        $payable = new Payable(1000, Currency::USD(), 'asdf', 1337);
+        $payable->setUser($billable);
+
+        $processor = $payable->process();
+        Event::assertDispatched(PaymentRegistered::class);
+        $payment = $processor->getPayment();
+        $this->assertEquals(PaymentStatus::NEW(), $payment->status);
+
+        try {
+            $processor->purchase(['gateway' => 'przelewy24']);
+        } catch (Exception $ex) {
+            $this->assertEquals('Missing Payment Gateway parameters: return_url, email', $ex->getMessage());
+        }
+
+        $processor->purchase(['gateway' => 'przelewy24', 'email' => 'test@localhost', 'return_url' => 'https://localhost.test']);
         $payment->refresh();
 
         $this->assertEquals(PaymentStatus::PAID(), $payment->status);

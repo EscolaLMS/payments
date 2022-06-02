@@ -32,13 +32,18 @@ abstract class AbstractDriver implements GatewayDriverContract
         }
     }
 
+    protected function getRequiredParameters(): array
+    {
+        return static::requiredParameters();
+    }
+
     public function hasAllRequiredParameters(array $parameters = []): bool
     {
-        return Arr::has($parameters, static::requiredParameters());
+        return empty($this->getRequiredParameters()) || Arr::has($parameters, $this->getRequiredParameters());
     }
 
     public function missingParameters(array $parameters = []): array
     {
-        return array_filter(static::requiredParameters(), fn (string $required) => !array_key_exists($required, $parameters));
+        return array_filter($this->getRequiredParameters(), fn (string $required) => !array_key_exists($required, $parameters));
     }
 }
