@@ -7,6 +7,7 @@
 [![downloads](https://img.shields.io/packagist/v/escolalms/payments)](https://packagist.org/packages/escolalms/payments)
 [![downloads](https://img.shields.io/packagist/l/escolalms/payments)](https://packagist.org/packages/escolalms/payments)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e42a94f20c76b719fc38/maintainability)](https://codeclimate.com/github/EscolaLMS/payments/maintainability)
+[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2FEscolaLMS%2Fpayments%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/EscolaLMS/payments/main)
 
 ## Purpose
 
