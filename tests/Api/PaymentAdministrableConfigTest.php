@@ -54,16 +54,9 @@ class PaymentAdministrableConfigTest extends TestCase
                 'drivers' => [
                     'stripe' => [
                         'enabled' => true,
-                        'secret_key' => 'key_value',
-                        'publishable_key' => 'publishable_key_value',
                     ],
                     'przelewy24' => [
                         'enabled' => true,
-                        'live' => true,
-                        'merchant_id' => 'merchant_id_value',
-                        'pos_id' => 'pos_id_value',
-                        'api_key' => 'api_key_value',
-                        'crc' => 'crc_value',
                     ],
                 ],
                 'default_gateway' => 'Stripe',
