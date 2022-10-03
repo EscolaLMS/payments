@@ -18,7 +18,7 @@ class SettingsServiceProvider extends ServiceProvider
             }
             AdministrableConfig::registerConfig('escolalms_payments.drivers.stripe.enabled', ['required', 'boolean']);
             AdministrableConfig::registerConfig('escolalms_payments.drivers.stripe.secret_key', ['required', 'string'], false);
-            AdministrableConfig::registerConfig('escolalms_payments.drivers.stripe.publishable_key', ['required', 'string'], false);
+            AdministrableConfig::registerConfig('escolalms_payments.drivers.stripe.publishable_key', ['required', 'string'], true);
 
             AdministrableConfig::registerConfig('escolalms_payments.drivers.przelewy24.enabled', ['required', 'boolean']);
             AdministrableConfig::registerConfig('escolalms_payments.drivers.przelewy24.live', ['required', 'boolean'], false);
