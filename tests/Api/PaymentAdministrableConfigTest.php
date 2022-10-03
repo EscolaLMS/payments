@@ -54,6 +54,7 @@ class PaymentAdministrableConfigTest extends TestCase
                 'drivers' => [
                     'stripe' => [
                         'enabled' => true,
+                        'publishable_key' => 'publishable_key_value',
                     ],
                     'przelewy24' => [
                         'enabled' => true,
