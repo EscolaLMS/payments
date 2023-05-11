@@ -36,7 +36,7 @@ class StripeDriver extends AbstractDriver implements GatewayDriverContract
     {
         $this->throwExceptionIfMissingParameters($parameters);
         return $this->gateway->purchase([
-            'amount' => $payment->amount,
+            'amount' => $payment->amount / 100,
             'currency' => (string) ($payment->currency ?? $this->config->getDefaultCurrency()),
             'description' => $payment->description,
             'paymentMethod' => $parameters['payment_method'],
