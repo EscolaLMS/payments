@@ -15,10 +15,12 @@ class PaymentsPermissionsSeeder extends Seeder
 
         Permission::findOrCreate(PaymentsPermissionsEnum::PAYMENTS_LIST, 'api');
         Permission::findOrCreate(PaymentsPermissionsEnum::PAYMENTS_READ, 'api');
+        Permission::findOrCreate(PaymentsPermissionsEnum::PAYMENTS_EXPORT, 'api');
 
         $admin->givePermissionTo([
             PaymentsPermissionsEnum::PAYMENTS_LIST,
             PaymentsPermissionsEnum::PAYMENTS_READ,
+            PaymentsPermissionsEnum::PAYMENTS_EXPORT,
         ]);
     }
 }

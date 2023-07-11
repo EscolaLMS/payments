@@ -27,4 +27,9 @@ class PaymentPolicy
 
         return false;
     }
+
+    public function export($user): bool
+    {
+        return $user->can(PaymentsPermissionsEnum::PAYMENTS_EXPORT);
+    }
 }

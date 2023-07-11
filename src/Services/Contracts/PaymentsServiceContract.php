@@ -24,4 +24,5 @@ interface PaymentsServiceContract
     public function searchPayments(CriteriaDto $criteriaDto, OrderDto $orderDto): LengthAwarePaginator;
     public function listPaymentsForUser(int $user_id): Collection;
     public function findPayment(int $id): ?Payment;
+    public function searchPaymentsForExport(CriteriaDto $criteriaDto, OrderDto $orderDto): Collection;
 }

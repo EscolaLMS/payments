@@ -107,4 +107,9 @@ class PaymentsService implements PaymentsServiceContract
     {
         return array_key_exists($driver, $this->listEnabledGateways());
     }
+
+    public function searchPaymentsForExport(CriteriaDto $criteriaDto, OrderDto $orderDto): Collection
+    {
+        return $this->repository()->searchAndOrder($criteriaDto, $orderDto)->get();
+    }
 }
