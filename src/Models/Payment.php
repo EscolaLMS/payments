@@ -2,7 +2,6 @@
 
 namespace EscolaLms\Payments\Models;
 
-use BenSampo\Enum\Traits\CastsEnums;
 use EscolaLms\Payments\Enums\Currency;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -54,7 +53,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Payment extends Model implements PaymentSchema
 {
-    use CastsEnums;
     use HasFactory;
 
     protected $guarded = [
