@@ -20,6 +20,8 @@ class ExportPaymentsTest extends TestCase
     {
         parent::setUp();
         $this->seed(PaymentsPermissionsSeeder::class);
+        $this->user = $this->makeAdmin();
+        $this->user->guard_name = 'api';
         Excel::fake();
     }
 
@@ -32,9 +34,7 @@ class ExportPaymentsTest extends TestCase
     {
         Payment::factory()->count(10)->create();
 
-        $admin = $this->makeAdmin();
-
-        $this->actingAs($admin, 'api')->json('GET', '/api/admin/payments/export')->assertOk();
+        $this->actingAs($this->user, 'api')->json('GET', '/api/admin/payments/export')->assertOk();
 
         Excel::assertDownloaded('payments.csv', function (PaymentsExport $paymentsExport) {
             $this->assertCount(10, $paymentsExport->collection());
@@ -46,9 +46,8 @@ class ExportPaymentsTest extends TestCase
     public function testExportPaymentsToExcel(): void
     {
         Payment::factory()->count(10)->create();
-        $admin = $this->makeAdmin();
 
-        $this->actingAs($admin, 'api')->json('GET', '/api/admin/payments/export', ['format' => ExportFormatEnum::XLSX])->assertOk();
+        $this->actingAs($this->user, 'api')->json('GET', '/api/admin/payments/export', ['format' => ExportFormatEnum::XLSX])->assertOk();
 
         Excel::assertDownloaded('payments.xlsx', function (PaymentsExport $paymentsExport) {
             $this->assertCount(10, $paymentsExport->collection());
@@ -56,7 +55,7 @@ class ExportPaymentsTest extends TestCase
             return true;
         });
 
-        $this->actingAs($admin, 'api')->json('GET', '/api/admin/payments/export', ['format' => ExportFormatEnum::XLS])->assertOk();
+        $this->actingAs($this->user, 'api')->json('GET', '/api/admin/payments/export', ['format' => ExportFormatEnum::XLS])->assertOk();
 
         Excel::assertDownloaded('payments.xls', function (PaymentsExport $paymentsExport) {
             $this->assertCount(10, $paymentsExport->collection());
@@ -70,9 +69,7 @@ class ExportPaymentsTest extends TestCase
         Payment::factory()->count(10)->create();
         Payment::factory()->count(5)->create(['status' => PaymentStatus::PAID]);
 
-        $admin = $this->makeAdmin();
-
-        $this->actingAs($admin, 'api')->json('GET', '/api/admin/payments/export', [
+        $this->actingAs($this->user, 'api')->json('GET', '/api/admin/payments/export', [
             'status' => PaymentStatus::PAID,
         ])->assertOk();
 
@@ -94,9 +91,7 @@ class ExportPaymentsTest extends TestCase
             'user_id' => $student->getKey(),
         ]);
 
-        $admin = $this->makeAdmin();
-
-        $this->actingAs($admin, 'api')->json('GET', '/api/admin/payments/export', [
+        $this->actingAs($this->user, 'api')->json('GET', '/api/admin/payments/export', [
             'user_id' => $student->getKey(),
             'status' => PaymentStatus::PAID,
         ])->assertOk();
