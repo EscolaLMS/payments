@@ -18,7 +18,7 @@ class ExportPaymentsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();
+        $this->seed(PaymentsPermissionsSeeder::class);
         $this->user = $this->makeAdmin();
         Excel::fake();
     }

@@ -11,6 +11,7 @@ class PaymentsPermissionsSeeder extends Seeder
 {
     public function run()
     {
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
         $admin = Role::findOrCreate('admin', 'api');
 
         Permission::findOrCreate(PaymentsPermissionsEnum::PAYMENTS_LIST, 'api');
