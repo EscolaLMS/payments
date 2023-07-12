@@ -184,6 +184,131 @@
                 ]
             }
         },
+        "/api/admin/payments/export": {
+            "get": {
+                "tags": [
+                    "Admin Payments"
+                ],
+                "summary": "Export payments to file",
+                "description": "Export filtered Payments",
+                "operationId": "7bacbd0d982aabbe9f1950b9d5961c83",
+                "parameters": [
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "created_at",
+                                "updated_at",
+                                "status",
+                                "payable_id",
+                                "user_id",
+                                "amount",
+                                "order_id",
+                                "id"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "ASC",
+                                "DESC"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Payment status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "new",
+                                "paid",
+                                "cancelled"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order_id",
+                        "in": "query",
+                        "description": "External order id (e.g. from payment provider)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "payable_id",
+                        "in": "query",
+                        "description": "Id of payable (e.g. order model id)",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "payable_type",
+                        "in": "query",
+                        "description": "Full classname of payable model (eg. EscolaLms\\Cart\\Models\\Order)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "description": "Id of user",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "description": "Date from",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "date_to",
+                        "in": "query",
+                        "description": "Date to",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
+        },
         "/api/payments": {
             "get": {
                 "tags": [
