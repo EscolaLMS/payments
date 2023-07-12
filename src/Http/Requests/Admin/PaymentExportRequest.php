@@ -10,7 +10,7 @@ class PaymentExportRequest extends PaymentsSearchAdminRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('export', Payment::class);
+        return $this->user('api') && $this->user('api')->can('export', Payment::class);
     }
 
     public function rules()
