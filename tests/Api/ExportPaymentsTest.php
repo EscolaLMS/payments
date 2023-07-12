@@ -20,8 +20,8 @@ class ExportPaymentsTest extends TestCase
     {
         parent::setUp();
         $this->seed(PaymentsPermissionsSeeder::class);
+        $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();
         $this->user = $this->makeAdmin();
-        $this->user->guard_name = 'api';
         Excel::fake();
     }
 
