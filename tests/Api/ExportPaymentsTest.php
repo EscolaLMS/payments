@@ -3,7 +3,6 @@
 namespace EscolaLms\Payments\Tests\Api;
 
 use EscolaLms\Core\Tests\CreatesUsers;
-use EscolaLms\Payments\Database\Seeders\PaymentsPermissionsSeeder;
 use EscolaLms\Payments\Enums\ExportFormatEnum;
 use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Exports\PaymentsExport;
@@ -19,7 +18,6 @@ class ExportPaymentsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(PaymentsPermissionsSeeder::class);
         Excel::fake();
     }
 
@@ -33,6 +31,7 @@ class ExportPaymentsTest extends TestCase
         Payment::factory()->count(10)->create();
 
         $admin = $this->makeAdmin();
+        $admin->save();
 
         $this->actingAs($admin, 'api')->json('GET', '/api/admin/payments/export')->assertOk();
 
@@ -47,6 +46,7 @@ class ExportPaymentsTest extends TestCase
     {
         Payment::factory()->count(10)->create();
         $admin = $this->makeAdmin();
+        $admin->save();
 
         $this->actingAs($admin, 'api')->json('GET', '/api/admin/payments/export', ['format' => ExportFormatEnum::XLSX])->assertOk();
 
