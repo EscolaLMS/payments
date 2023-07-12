@@ -9,9 +9,7 @@ use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Exports\PaymentsExport;
 use EscolaLms\Payments\Models\Payment;
 use EscolaLms\Payments\Tests\TestCase;
-use EscolaLms\Reports\Tests\Models\Client;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Laravel\Passport\Passport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExportPaymentsTest extends TestCase
@@ -21,7 +19,6 @@ class ExportPaymentsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Passport::useClientModel(Client::class);
         $this->seed(PaymentsPermissionsSeeder::class);
         Excel::fake();
     }
