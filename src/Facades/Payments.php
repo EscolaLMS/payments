@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static Collection searchPayments(CriteriaDto $criteriaDto, OrderDto $orderDto)
  * @method static Collection listPaymentsForUser(int $user_id)
  * @method static Payment findPayment(int $id)
+ * @method static Collection searchPaymentsForExport(CriteriaDto $criteriaDto, OrderDto $orderDto)
  *
  * @see \EscolaLms\Payments\Services\PaymentsService
  */

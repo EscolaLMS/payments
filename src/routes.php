@@ -10,6 +10,7 @@ Route::group(['prefix' => 'api'], function () {
     Route::any('/payments-gateways/callback/{payment}', [GatewayController::class, 'callback'])->name('payments-gateway-callback');
 
     Route::group(['prefix' => 'admin/payments', 'middleware' => ['auth:api']], function () {
+        Route::get('/export', [PaymentsAdminController::class, 'export']);
         Route::get('/{payment}', [PaymentsAdminController::class, 'show']);
         Route::get('/', [PaymentsAdminController::class, 'search']);
     });
