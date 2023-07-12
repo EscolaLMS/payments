@@ -9,17 +9,15 @@ use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Exports\PaymentsExport;
 use EscolaLms\Payments\Models\Payment;
 use EscolaLms\Payments\Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExportPaymentsTest extends TestCase
 {
-    use CreatesUsers, DatabaseTransactions;
+    use CreatesUsers;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(PaymentsPermissionsSeeder::class);
         $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();
         $this->user = $this->makeAdmin();
         Excel::fake();

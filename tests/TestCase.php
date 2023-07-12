@@ -2,6 +2,7 @@
 
 namespace EscolaLms\Payments\Tests;
 
+use EscolaLms\Payments\Database\Seeders\PaymentsPermissionsSeeder;
 use EscolaLms\Payments\Providers\PaymentsServiceProvider;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -15,6 +16,7 @@ class TestCase extends \EscolaLms\Core\Tests\TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed(PaymentsPermissionsSeeder::class);
     }
 
     protected function getPackageProviders($app): array
