@@ -6,12 +6,14 @@ use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Events\PaymentFailed;
 use EscolaLms\Payments\Events\PaymentRegistered;
+use EscolaLms\Payments\Events\PaymentSuccess;
 use EscolaLms\Payments\Exceptions\CardDeclined;
 use EscolaLms\Payments\Exceptions\ExpiredCard;
 use EscolaLms\Payments\Exceptions\IncorrectCvc;
 use EscolaLms\Payments\Exceptions\PaymentException;
 use EscolaLms\Payments\Exceptions\ProcessingError;
 use EscolaLms\Payments\Facades\PaymentGateway;
+use EscolaLms\Payments\Models\Payment;
 use EscolaLms\Payments\Tests\Mocks\Payable;
 use EscolaLms\Payments\Tests\Traits\CreatesBillable;
 use EscolaLms\Payments\Tests\Traits\CreatesPaymentMethods;
@@ -210,4 +212,36 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
             Event::assertDispatched(PaymentFailed::class);
         }
     }
+
+    function testWebhookStripeIntent()
+    {
+        Event::fake();
+        $billable = $this->createBillableStudent();
+
+        /** @var Payment $payment */
+        $payment = Payment::factory()->create([
+            'status' => PaymentStatus::INTENT,
+            'client_secret' => 'test_client_secret'
+        ]);
+
+        $payment->user()->associate($billable);
+        $payment->save();
+
+        PaymentGateway::fake();
+        $this->post('api/payments-gateways/webhook/stripe-intent', [
+            'id' => 'sadsaf',
+            'intent' => [
+                'id' => 'asdsad',
+                'client_secret' => 'asdsadasd'
+            ]])
+            ->assertOk();
+
+        Event::assertDispatched(PaymentSuccess::class);
+
+        $this->assertDatabaseHas('payments', [
+            'id' => $payment->getKey(),
+            'status' => PaymentStatus::PAID,
+        ]);
+    }
+
 }

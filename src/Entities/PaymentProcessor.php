@@ -7,14 +7,18 @@ use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Events\PaymentCancelled;
 use EscolaLms\Payments\Events\PaymentFailed;
+use EscolaLms\Payments\Events\PaymentIntent;
 use EscolaLms\Payments\Events\PaymentRequiresRedirect;
 use EscolaLms\Payments\Events\PaymentSuccess;
 use EscolaLms\Payments\Facades\PaymentGateway;
 use EscolaLms\Payments\Facades\Payments;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
+use EscolaLms\Payments\Gateway\Drivers\Contracts\IntentDriverContract;
+use EscolaLms\Payments\Gateway\Responses\Contracts\IntentResponseInterface;
 use EscolaLms\Payments\Models\Payment;
 use Illuminate\Http\Request;
 use Omnipay\Common\Message\RedirectResponseInterface;
+use Stripe\Event;
 
 class PaymentProcessor
 {
@@ -96,9 +100,12 @@ class PaymentProcessor
         }
 
         $this->savePayment();
-
         $response = $this->getPaymentDriver()->purchase($this->payment, $parameters);
-        if ($response->isSuccessful()) {
+        
+        if ($response instanceof IntentResponseInterface && $response->isSuccessful()) {
+            $this->setPaymentClientSecret($response->getTransactionReference());
+            $this->setIntent();
+        } elseif ($response->isSuccessful()) {
             $this->setSuccessful();
         } elseif ($response->isRedirect()) {
             assert($response instanceof RedirectResponseInterface);
@@ -131,33 +138,24 @@ class PaymentProcessor
         return $this;
     }
 
-    private function setSuccessful(): void
+    public function webhook(Event $event, string $driver): self
     {
-        $this->setPaymentStatus(PaymentStatus::PAID());
-        event(new PaymentSuccess($this->payment->user, $this->payment));
+        match ($driver) {
+            'stripe-intent' => $this->stripeWebhook($event),
+            default => null,
+        };
+        return $this;
     }
 
-    private function clearRedirect(): void
+    public function stripeWebhook(Event $event): self
     {
-        $this->payment->redirect_url = null;
-    }
+        match ($event->type) {
+            Event::PAYMENT_INTENT_SUCCEEDED => $this->setSuccessful(),
+            Event::PAYMENT_INTENT_CANCELED => $this->setCancelled(),
+            default => null,
+        };
 
-    private function setRedirect(string $redirect_url): void
-    {
-        $this->payment->redirect_url = $redirect_url;
-        $this->setPaymentStatus(PaymentStatus::REQUIRES_REDIRECT());
-    }
-
-    private function setCancelled(): void
-    {
-        $this->setPaymentStatus(PaymentStatus::CANCELLED());
-        event(new PaymentCancelled($this->payment->user, $this->payment));
-    }
-
-    private function setError(string $message, string $code = '0'): void
-    {
-        $this->setPaymentStatus(PaymentStatus::FAILED());
-        event(new PaymentFailed($this->payment->user, $this->payment, $code, $message));
+        return $this;
     }
 
     public function isNew(): bool
@@ -185,14 +183,55 @@ class PaymentProcessor
         return $this->getPayment()->status->is(PaymentStatus::CANCELLED);
     }
 
+    protected function getPaymentDriver(): GatewayDriverContract|IntentDriverContract
+    {
+        return PaymentGateway::driver($this->getPaymentDriverName());
+    }
+
+    private function setSuccessful(): void
+    {
+        $this->setPaymentStatus(PaymentStatus::PAID());
+        event(new PaymentSuccess($this->payment->user, $this->payment));
+    }
+
+    private function clearRedirect(): void
+    {
+        $this->payment->redirect_url = null;
+    }
+
+    private function setRedirect(string $redirect_url): void
+    {
+        $this->payment->redirect_url = $redirect_url;
+        $this->setPaymentStatus(PaymentStatus::REQUIRES_REDIRECT());
+    }
+
+    private function setCancelled(): void
+    {
+        $this->setPaymentStatus(PaymentStatus::CANCELLED());
+        event(new PaymentCancelled($this->payment->user, $this->payment));
+    }
+
+    private function setIntent(): void
+    {
+        $this->setPaymentStatus(PaymentStatus::INTENT());
+        event(new PaymentIntent($this->payment->user, $this->payment));
+    }
+
+    private function setError(string $message, string $code = '0'): void
+    {
+        $this->setPaymentStatus(PaymentStatus::FAILED());
+        event(new PaymentFailed($this->payment->user, $this->payment, $code, $message));
+    }
+
     private function setPaymentStatus(PaymentStatus $status): bool
     {
         $this->payment->status = $status;
         return $this->payment->save();
     }
 
-    protected function getPaymentDriver(): GatewayDriverContract
+    private function setPaymentClientSecret(string $key): bool
     {
-        return PaymentGateway::driver($this->getPaymentDriverName());
+        $this->payment->client_secret = $key;
+        return $this->payment->save();
     }
 }

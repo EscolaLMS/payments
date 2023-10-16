@@ -31,6 +31,11 @@ class PaymentsConfig
         return $this->config['drivers']['stripe']['enabled'] ?? false;
     }
 
+    public function isStripeIntentEnabled(): bool
+    {
+        return $this->config['drivers']['stripe-intent']['enabled'] ?? false;
+    }
+
     public function getStripeSecretKey(): ?string
     {
         return $this->config['drivers']['stripe']['secret_key'] ?? null;

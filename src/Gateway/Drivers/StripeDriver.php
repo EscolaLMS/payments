@@ -32,12 +32,20 @@ class StripeDriver extends AbstractDriver implements GatewayDriverContract
         $this->gateway->setApiKey($this->config->getStripeSecretKey());
     }
 
+    public static function requiredParameters(): array
+    {
+        return [
+            'return_url',
+            'payment_method',
+        ];
+    }
+
     public function purchase(Payment $payment, array $parameters = []): ResponseInterface
     {
         $this->throwExceptionIfMissingParameters($parameters);
         return $this->gateway->purchase([
             'amount' => number_format($payment->amount / 100, 2, '.', ''),
-            'currency' => (string) ($payment->currency ?? $this->config->getDefaultCurrency()),
+            'currency' => (string)($payment->currency ?? $this->config->getDefaultCurrency()),
             'description' => $payment->description,
             'paymentMethod' => $parameters['payment_method'],
             'returnUrl' => $parameters['return_url'],
@@ -53,14 +61,6 @@ class StripeDriver extends AbstractDriver implements GatewayDriverContract
     public function callback(Request $request, array $parameters = []): CallbackResponse
     {
         return new CallbackResponse();
-    }
-
-    public static function requiredParameters(): array
-    {
-        return [
-            'return_url',
-            'payment_method',
-        ];
     }
 
     public function throwExceptionForResponse(ResponseInterface $response): void
