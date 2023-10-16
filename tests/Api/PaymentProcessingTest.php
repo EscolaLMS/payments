@@ -228,14 +228,13 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         $payment->save();
 
         PaymentGateway::fake();
-        $res = $this->post('api/payments-gateways/webhook/stripe-intent', [
+        $this->post('api/payments-gateways/webhook/stripe-intent', [
             'id' => 'sadsaf',
             'intent' => [
                 'id' => 'asdsad',
                 'client_secret' => 'asdsadasd'
-            ]]);
-
-        dd($res->json());
+            ]])
+            ->assertOk();
 
         Event::assertDispatched(PaymentSuccess::class);
 

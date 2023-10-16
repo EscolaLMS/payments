@@ -1,74 +1,75 @@
 {
-    "name": "escolalms/payments",
-    "description": "Escola LMS Payments Package.",
-    "type": "package",
-    "require": {
-        "php": "^7.4|^8.0",
-        "laravel/framework": "^8|^9",
-        "escolalms/core": "^1",
-        "league/omnipay": "^3",
-        "omnipay/stripe": "^3.1",
-        "mnastalski/przelewy24-php": "^0.0.4",
-        "maatwebsite/excel": "^3.1"
+  "name": "escolalms/payments",
+  "description": "Escola LMS Payments Package.",
+  "type": "package",
+  "require": {
+    "php": "^7.4|^8.0",
+    "laravel/framework": "^8|^9",
+    "escolalms/core": "^1",
+    "league/omnipay": "^3",
+    "omnipay/stripe": "^3.1",
+    "mnastalski/przelewy24-php": "^0.0.4",
+    "maatwebsite/excel": "^3.1",
+    "stripe/stripe-php": "*"
+  },
+  "require-dev": {
+    "barryvdh/laravel-ide-helper": "^2.10",
+    "nunomaduro/collision": "^5.4",
+    "nunomaduro/larastan": "^0.7.6",
+    "orchestra/testbench": "~5|~6",
+    "phpunit/phpunit": "^9.0",
+    "escolalms/settings": "^0.1.7",
+    "php-http/message-factory": "^1.1"
+  },
+  "suggest": {
+    "escolalms/settings": "For settings to work"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Paweł Chołaj",
+      "email": "pawel.cholaj@escola.pl",
+      "homepage": "https://cholaj.pl"
     },
-    "require-dev": {
-        "barryvdh/laravel-ide-helper": "^2.10",
-        "nunomaduro/collision": "^5.4",
-        "nunomaduro/larastan": "^0.7.6",
-        "orchestra/testbench": "~5|~6",
-        "phpunit/phpunit": "^9.0",
-        "escolalms/settings": "^0.1.7",
-        "php-http/message-factory": "^1.1"
-    },
-    "suggest": {
-        "escolalms/settings": "For settings to work"
-    },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Paweł Chołaj",
-            "email": "pawel.cholaj@escola.pl",
-            "homepage": "https://cholaj.pl"
-        },
-        {
-            "name": "Mariusz Gliwiński",
-            "email": "mariusz.gliwinski@escola.pl"
-        }
-    ],
-    "replace": {
-        "symfony/polyfill-php54": "*",
-        "symfony/polyfill-php55": "*",
-        "symfony/polyfill-php56": "*",
-        "symfony/polyfill-php70": "*",
-        "symfony/polyfill-php72": "*",
-        "symfony/polyfill-php73": "*",
-        "symfony/polyfill-php82": "*"
-    },
-    "autoload": {
-        "psr-4": {
-            "EscolaLms\\Payments\\": "src",
-            "Database\\Factories\\EscolaLms\\Payments\\Models\\": "database/factories",
-            "EscolaLms\\Payments\\Database\\Seeders\\": "database/seeders",
-            "EscolaLms\\Payments\\Tests\\": "tests"
-        }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "EscolaLms\\Payments\\Providers\\PaymentsServiceProvider"
-            ],
-            "aliases": {
-                "PaymentGateway": "EscolaLms\\Payments\\Facades\\PaymentGateway",
-                "Payments": "EscolaLms\\Payments\\Facades\\Payments"
-            }
-        },
-        "branch-alias": {
-            "dev-main": "0.x-dev"
-        }
-    },
-    "config": {
-        "allow-plugins": {
-            "php-http/discovery": true
-        }
+    {
+      "name": "Mariusz Gliwiński",
+      "email": "mariusz.gliwinski@escola.pl"
     }
+  ],
+  "replace": {
+    "symfony/polyfill-php54": "*",
+    "symfony/polyfill-php55": "*",
+    "symfony/polyfill-php56": "*",
+    "symfony/polyfill-php70": "*",
+    "symfony/polyfill-php72": "*",
+    "symfony/polyfill-php73": "*",
+    "symfony/polyfill-php82": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "EscolaLms\\Payments\\": "src",
+      "Database\\Factories\\EscolaLms\\Payments\\Models\\": "database/factories",
+      "EscolaLms\\Payments\\Database\\Seeders\\": "database/seeders",
+      "EscolaLms\\Payments\\Tests\\": "tests"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "EscolaLms\\Payments\\Providers\\PaymentsServiceProvider"
+      ],
+      "aliases": {
+        "PaymentGateway": "EscolaLms\\Payments\\Facades\\PaymentGateway",
+        "Payments": "EscolaLms\\Payments\\Facades\\Payments"
+      }
+    },
+    "branch-alias": {
+      "dev-main": "0.x-dev"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
+  }
 }
