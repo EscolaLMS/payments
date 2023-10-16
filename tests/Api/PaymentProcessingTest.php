@@ -2,7 +2,6 @@
 
 namespace EscolaLms\Payments\Tests\Api;
 
-use EscolaLms\Cart\Models\Product;
 use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Events\PaymentFailed;
@@ -217,15 +216,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
     function testWebhookStripeIntent()
     {
         Event::fake();
-
-        /** @var Product $product */
-        $product = Product::factory()->create([
-            'price' => 1000,
-            'purchasable' => true,
-        ]);
-
         $billable = $this->createBillableStudent();
-
 
         /** @var Payment $payment */
         $payment = Payment::factory()->create([
