@@ -3,7 +3,9 @@
 namespace EscolaLms\Payments\Http\Controllers;
 
 use EscolaLms\Core\Http\Controllers\EscolaLmsBaseController;
+use EscolaLms\Payments\Facades\PaymentGateway;
 use EscolaLms\Payments\Facades\Payments;
+use EscolaLms\Payments\Gateway\Drivers\Contracts\WebHookDriverContract;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -17,12 +19,22 @@ class GatewayController extends EscolaLmsBaseController
 
     public function callback(Request $request): JsonResponse
     {
-        $payment = Payments::findPayment((int) $request->route('payment'));
+        $payment = Payments::findPayment((int)$request->route('payment'));
         if (is_null($payment)) {
             Log::error(__('Callback called for undefined payment :id', ['id' => $request->route('payment')]));
             return $this->sendError(__('Payment not found'), 404);
         }
         Payments::processPayment($payment)->callback($request);
+        return $this->sendSuccess('OK');
+    }
+
+    public function webhook(Request $request, string $driverName): JsonResponse
+    {
+        $driver = PaymentGateway::driver($driverName);
+        assert($driver instanceof WebHookDriverContract);
+        $webHookDto = $driver->getWebhookData($request);
+        Payments::processPayment($webHookDto->payment)->webhook($webHookDto->event, $driverName);
+
         return $this->sendSuccess('OK');
     }
 }

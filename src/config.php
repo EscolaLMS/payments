@@ -7,8 +7,8 @@ return [
     'default_gateway' => env('PAYMENTS_DEFAULT_GATEWAY', 'Stripe'),
     'default_currency' => env('PAYMENTS_DEFAULT_CURRENCY', EscolaLms\Payments\Enums\Currency::USD),
 
-    /** 
-     * Driver specific settings 
+    /**
+     * Driver specific settings
      */
     'drivers' => [
         'free' => [],
@@ -17,6 +17,11 @@ return [
             'secret_key' => env('PAYMENTS_STRIPE_SECRET_KEY'),
             'publishable_key' => env('PAYMENTS_STRIPE_PUBLISHABLE_KEY'),
             'allowed_payment_method_types' => ['card'],
+        ],
+        'stripe-intent' => [
+            'enabled' => true,
+            'secret_key' => env('PAYMENTS_STRIPE_SECRET_KEY'),
+            'publishable_key' => env('PAYMENTS_STRIPE_PUBLISHABLE_KEY'),
         ],
         'przelewy24' => [
             'enabled' => true,

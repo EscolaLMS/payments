@@ -5,27 +5,26 @@ namespace EscolaLms\Payments\Services;
 use EscolaLms\Core\Dtos\CriteriaDto;
 use EscolaLms\Core\Dtos\OrderDto;
 use EscolaLms\Payments\Contracts\Payable;
+use EscolaLms\Payments\Entities\PaymentProcessor;
 use EscolaLms\Payments\Entities\PaymentsConfig;
 use EscolaLms\Payments\Events\PaymentRegistered;
 use EscolaLms\Payments\Facades\PaymentGateway;
+use EscolaLms\Payments\Gateway\Drivers\Przelewy24Driver;
+use EscolaLms\Payments\Gateway\Drivers\StripeDriver;
 use EscolaLms\Payments\Models\Payment;
 use EscolaLms\Payments\Repositories\Contracts\PaymentsRepositoryContract;
 use EscolaLms\Payments\Services\Contracts\PaymentsServiceContract;
-use EscolaLms\Payments\Entities\PaymentProcessor;
-use EscolaLms\Payments\Gateway\Drivers\Przelewy24Driver;
-use EscolaLms\Payments\Gateway\Drivers\StripeDriver;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Config;
+use Stripe\Exception\SignatureVerificationException;
+use Stripe\Webhook;
 
 class PaymentsService implements PaymentsServiceContract
 {
-    private function repository(): PaymentsRepositoryContract
-    {
-        return app(PaymentsRepositoryContract::class);
-    }
-
     public function getPaymentsConfig(): PaymentsConfig
     {
         return PaymentGateway::getPaymentsConfig();
@@ -68,6 +67,16 @@ class PaymentsService implements PaymentsServiceContract
         return Payment::find($id);
     }
 
+    /**
+     */
+    public function handleWebhook(Request $request, string $driver): void
+    {
+        match ($driver) {
+            'stripe' => $this->handleStripeWebhook($request->getContent(), $request->header('HTTP_STRIPE_SIGNATURE')),
+            default => $this->handleUnknownWebhook($request)
+        };
+    }
+
     public function processPayment(Payment $payment): PaymentProcessor
     {
         return new PaymentProcessor($payment);
@@ -82,8 +91,9 @@ class PaymentsService implements PaymentsServiceContract
     {
         return array_filter([
             'stripe' => $this->getPaymentsConfig()->isStripeEnabled(),
-            'przelewy24' => $this->getPaymentsConfig()->isPrzelewy24Enabled()
-        ], fn (bool $enabled) => $enabled);
+            'przelewy24' => $this->getPaymentsConfig()->isPrzelewy24Enabled(),
+            'stripe-intent' => $this->getPaymentsConfig()->isStripeIntentEnabled(),
+        ], fn(bool $enabled) => $enabled);
     }
 
     public function listGatewaysWithRequiredParameters(): array
@@ -111,5 +121,31 @@ class PaymentsService implements PaymentsServiceContract
     public function searchPaymentsForExport(CriteriaDto $criteriaDto, OrderDto $orderDto): Collection
     {
         return $this->repository()->searchAndOrder($criteriaDto, $orderDto)->get();
+    }
+
+    private function repository(): PaymentsRepositoryContract
+    {
+        return app(PaymentsRepositoryContract::class);
+    }
+
+    /**
+     * @throws SignatureVerificationException
+     */
+    private function handleStripeWebhook(string $payload, string $sigHeader): PaymentProcessor
+    {
+        $event = Webhook::constructEvent(
+            $payload,
+            $sigHeader,
+            Config::get('services.stripe.webhook.secret')
+        );
+
+        $payment = Payment::query()->where('client_secret', $event->data->object->client_secret)->firstOrFail();
+
+        return (new PaymentProcessor($payment->refresh()))->stripeWebhook($event);
+    }
+
+    private function handleUnknownWebhook()
+    {
+
     }
 }

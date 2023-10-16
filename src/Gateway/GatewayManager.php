@@ -7,6 +7,7 @@ use EscolaLms\Payments\Exceptions\GatewayConfigException;
 use EscolaLms\Payments\Gateway\Drivers\FreeDriver;
 use EscolaLms\Payments\Gateway\Drivers\Przelewy24Driver;
 use EscolaLms\Payments\Gateway\Drivers\StripeDriver;
+use EscolaLms\Payments\Gateway\Drivers\StripeIntentDriver;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Manager;
 
@@ -44,6 +45,17 @@ class GatewayManager extends Manager
             throw new GatewayConfigException(__('Missing Stripe configuration'));
         }
         return new StripeDriver($this->paymentsConfig);
+    }
+
+    public function createStripeIntentDriver(): StripeIntentDriver
+    {
+        if (!$this->paymentsConfig->isStripeIntentEnabled()) {
+            throw new GatewayConfigException(__('Stripe intent payments gateway is disabled'));
+        }
+        if (!$this->paymentsConfig->hasValidConfigForStripe()) {
+            throw new GatewayConfigException(__('Missing Stripe configuration'));
+        }
+        return new StripeIntentDriver($this->paymentsConfig);
     }
 
     public function createPrzelewy24Driver(): Przelewy24Driver
