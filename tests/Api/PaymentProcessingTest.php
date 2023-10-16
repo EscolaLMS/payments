@@ -2,7 +2,6 @@
 
 namespace EscolaLms\Payments\Tests\Api;
 
-use EscolaLms\Cart\Models\Order;
 use EscolaLms\Cart\Models\Product;
 use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
@@ -227,12 +226,6 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
 
         $billable = $this->createBillableStudent();
 
-        /** @var Order $order */
-        $order = Order::factory()->create([
-            'user_id' => $billable->getKey(),
-        ]);
-
-        $product = Product::factory()->create();
 
         /** @var Payment $payment */
         $payment = Payment::factory()->create([
@@ -241,8 +234,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         ]);
 
         $payment->user()->associate($billable);
-
-        $order->payments()->save($payment);
+        $payment->save();
 
         PaymentGateway::fake();
         $this->post('api/payments-gateways/webhook/stripe-intent', [
