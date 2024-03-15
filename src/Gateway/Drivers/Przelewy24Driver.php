@@ -2,7 +2,6 @@
 
 namespace EscolaLms\Payments\Gateway\Drivers;
 
-use EscolaLms\Payments\Dtos\PaymentDto;
 use EscolaLms\Payments\Entities\PaymentsConfig;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
 use EscolaLms\Payments\Gateway\Responses\CallbackResponse;
@@ -10,9 +9,9 @@ use EscolaLms\Payments\Gateway\Responses\Przelewy24GatewayResponse;
 use EscolaLms\Payments\Models\Payment;
 use Illuminate\Http\Request;
 use Omnipay\Common\Message\ResponseInterface;
-use Przelewy24\Exceptions\ApiResponseException;
+use Przelewy24\Enums\Currency as Przelewy24Currency;
+use Przelewy24\Exceptions\Przelewy24Exception;
 use Przelewy24\Przelewy24;
-use Przelewy24\TransactionStatusNotification;
 
 class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
 {
@@ -22,13 +21,13 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
     {
         $this->config = $config;
 
-        $this->gateway = new Przelewy24([
-            'api_key' => $this->config->getPrzelewy24ApiKey(),
-            'crc' => $this->config->getPrzelewy24Crc(),
-            'live' => $this->config->getPrzelewy24Live(),
-            'merchant_id' => $this->config->getPrzelewy24MerchantId(),
-            'pos_id' => $this->config->getPrzelewy24PosId(),
-        ]);
+        $this->gateway = new Przelewy24(
+            $this->config->getPrzelewy24MerchantId(),
+            $this->config->getPrzelewy24ApiKey(),
+            $this->config->getPrzelewy24Crc(),
+            $this->config->getPrzelewy24Live(),
+            $this->config->getPrzelewy24PosId(),
+        );
     }
 
     public function purchase(Payment $payment, array $parameters = []): ResponseInterface
@@ -36,16 +35,17 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
         $this->throwExceptionIfMissingParameters($parameters);
 
         try {
-            $response = $this->gateway->transaction([
-                'amount' => $payment->amount,
-                'currency' => (string) ($payment->currency ?? $this->config->getDefaultCurrency()),
-                'description' => $payment->description,
-                'url_return' => $parameters['return_url'],
-                'url_status' => route('payments-gateway-callback', ['payment' => $payment->getKey()]),
-                'email' => $parameters['email'],
-                'session_id' => ($payment->order_id ? $payment->order_id . '_' : '') . $payment->getKey(),
-            ]);
-        } catch (ApiResponseException $exception) {
+            $response = $this->gateway->transactions()->register(
+                sessionId: ($payment->order_id ? $payment->order_id . '_' : '') . $payment->getKey(),
+                amount: $payment->amount,
+                description: !empty($payment->description) ? $payment->description : 'Payment',
+                email: $parameters['email'],
+                urlReturn: $parameters['return_url'],
+                currency: Przelewy24Currency::tryFrom($payment->currency) ?? Przelewy24Currency::PLN,
+                urlStatus: route('payments-gateway-callback', ['payment' => $payment->getKey()]),
+                // methodRefId: md5(rand(0, 100))
+            );
+        } catch (Przelewy24Exception $exception) {
             return Przelewy24GatewayResponse::fromApiResponseException($exception);
         }
 
@@ -54,17 +54,17 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
 
     public function callback(Request $request, array $parameters = []): CallbackResponse
     {
-        $callbackNotification = new TransactionStatusNotification($request->input());
+        $callbackNotification = $this->gateway->handleWebhook($request->input());
 
         try {
-            $response = $this->gateway->verify([
-                'session_id' => $callbackNotification->sessionId(),
-                'order_id' => $callbackNotification->orderId(),
-                'amount' => $callbackNotification->amount(),
-                'currency' => $callbackNotification->currency(),
-            ]);
+            $response = $this->gateway->transactions()->verify(
+                sessionId: $callbackNotification->sessionId(),
+                orderId: $callbackNotification->orderId(),
+                amount: $callbackNotification->amount(),
+                currency: $callbackNotification->currency(),
+            );
             return new CallbackResponse(true, $callbackNotification->orderId());
-        } catch (ApiResponseException $exception) {
+        } catch (Przelewy24Exception $exception) {
             return new CallbackResponse(false, $callbackNotification->orderId(), $exception->getMessage());
         }
     }

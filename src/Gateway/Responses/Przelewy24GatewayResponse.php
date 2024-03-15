@@ -5,8 +5,8 @@ namespace EscolaLms\Payments\Gateway\Responses;
 use EscolaLms\Payments\Gateway\Requests\NoneGatewayRequest;
 use Omnipay\Common\Message\RedirectResponseInterface;
 use Omnipay\Common\Message\ResponseInterface;
-use Przelewy24\Api\Response\RegisterTransactionResponse;
-use Przelewy24\Exceptions\ApiResponseException;
+use Przelewy24\Api\Responses\Transaction\RegisterTransactionResponse;
+use Przelewy24\Exceptions\Przelewy24Exception;
 
 class Przelewy24GatewayResponse implements ResponseInterface, RedirectResponseInterface
 {
@@ -25,12 +25,12 @@ class Przelewy24GatewayResponse implements ResponseInterface, RedirectResponseIn
     {
         return new self(
             $response->token(),
-            $response->redirectUrl(),
+            $response->gatewayUrl(),
             __('Transaction registered'),
         );
     }
 
-    public static function fromApiResponseException(ApiResponseException $exception): self
+    public static function fromApiResponseException(Przelewy24Exception $exception): self
     {
         return new self(
             null,
