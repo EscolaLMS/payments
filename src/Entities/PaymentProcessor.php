@@ -88,6 +88,11 @@ class PaymentProcessor
 
     public function purchase(array $parameters = []): self
     {
+        // stripe throw error unsupported !!
+        // todo $paramters['subs'], $paramters['trial'], $paramters['recursive'] itp
+
+
+
         $driver = $parameters['gateway'] ?? null;
         if (!is_null($driver) && Payments::isDriverEnabled($driver)) {
             $this->setPaymentDriverName($driver);

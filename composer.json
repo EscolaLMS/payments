@@ -70,5 +70,17 @@
         "allow-plugins": {
             "php-http/discovery": true
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "name": "mnastalski/przelewy24-php",
+            "url": "../przelewy24-php",
+            "options": {
+                "versions": {
+                    "mnastalski/przelewy24-php": "v1.2.0"
+                }
+            }
+        }
+    ]
 }
