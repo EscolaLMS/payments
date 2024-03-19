@@ -2,7 +2,9 @@
 
 namespace EscolaLms\Payments\Gateway\Drivers;
 
+use EscolaLms\Payments\Exceptions\ActionNotSupported;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
+use EscolaLms\Payments\Gateway\Responses\CallbackRefundResponse;
 use EscolaLms\Payments\Gateway\Responses\CallbackResponse;
 use EscolaLms\Payments\Gateway\Responses\NoneGatewayResponse;
 use EscolaLms\Payments\Models\Payment;
@@ -24,5 +26,15 @@ class FreeDriver extends AbstractDriver implements GatewayDriverContract
     public static function requiredParameters(): array
     {
         return [];
+    }
+
+    public function callbackRefund(Request $request, array $parameters = []): CallbackRefundResponse
+    {
+        return new CallbackRefundResponse();
+    }
+
+    public function refund(Request $request, Payment $payment, array $parameters = [])
+    {
+        return throw new ActionNotSupported();
     }
 }

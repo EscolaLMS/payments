@@ -80,9 +80,15 @@ class PaymentProcessor
         return $this->payment->driver ?? PaymentGateway::getDefaultDriver();
     }
 
-    public function savePayment(array $parameters = []): self
+    public function savePayment(): self
     {
-        $this->payment->save($parameters);
+        $this->payment->save();
+        return $this;
+    }
+
+    public function updatePayment(array $parameters = []): self
+    {
+        $this->payment->update($parameters);
         return $this;
     }
 
@@ -131,7 +137,7 @@ class PaymentProcessor
                     'gateway_refunds_uuid' => Uuid::uuid4()
                 ];
 
-                $this->savePayment($refundParameters);
+                $this->updatePayment($refundParameters);
 
                 $this->getPaymentDriver()->refund($request, $this->payment, $refundParameters);
 

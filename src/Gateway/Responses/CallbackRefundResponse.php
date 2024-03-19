@@ -12,7 +12,7 @@ class CallbackRefundResponse
 
     private ?string $error;
 
-    public function __construct(bool $success = true, ?int $order_id, ?string $request_id = null, ?string $refunds_uuid = null, ?string $error = null)
+    public function __construct(bool $success = true, ?int $order_id = null, ?string $request_id = null, ?string $refunds_uuid = null, ?string $error = null)
     {
         $this->success = $success;
         $this->order_id = $order_id;

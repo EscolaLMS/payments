@@ -36,17 +36,10 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
 
     public function purchase(Payment $payment, array $parameters = []): ResponseInterface
     {
-        /**
-         * 1. Sprawdzenie, czy subskrypcja jeśli nie to standardowy flow transatcion(..., ...)
-         * 2a. Sprawdzenie, czy ma tial -> $parameters['has_trail'], ... -> płatność na 1zł, refund, zapis w order, że REFUND ???
-         * 2b. W przeciwny wypadku, -> pierwsze kupno subskrypcji
-         * 2c. W przeciwny wypadku, -> przedłużenie subskrypcji (inicjowane z paczki cart, cron, pobranie ostatniego order itp)
-         */
-
         $this->throwExceptionIfMissingParameters($parameters);
 
         try {
-            if ($this->hasSubscription($parameters)) {
+            if ($this->hasRecursiveSubscription($parameters)) {
                 $response = $this->recursiveTransaction($payment, $parameters);
             }
             else {
@@ -101,7 +94,7 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
             email: $parameters['email'],
             urlReturn: $parameters['return_url'],
             currency: Przelewy24Currency::tryFrom($payment->currency) ?? Przelewy24Currency::PLN,
-            urlStatus: 'https://webhook-test.com/13d9c3a443a8812727d4700be3fad14e',
+            urlStatus: 'https://webhook-test.com/7f9d02b905914e557a5bf05963514140',
             //urlStatus: route('payments-gateway-callback', ['payment' => $payment->getKey()]),
             channel: TransactionChannel::CARDS_ONLY->value,
         );
@@ -120,7 +113,7 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
                     )
                 ],
                 refundsUuid: $parameters['gateway_refunds_uuid'],
-                urlStatus: 'https://webhook-test.com/13d9c3a443a8812727d4700be3fad14e',
+                urlStatus: 'https://webhook-test.com/7f9d02b905914e557a5bf05963514140',
             );
 
             //return Przelewy24RefundResponse::fromRegisterTransactionResponse($response);
@@ -151,7 +144,7 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
         ];
     }
 
-    private function hasSubscription(array $parameters = []): bool
+    private function hasRecursiveSubscription(array $parameters = []): bool
     {
         if (!$parameters) {
             return false;
