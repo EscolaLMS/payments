@@ -139,9 +139,11 @@ class PaymentProcessor
 
                 $this->updatePayment($refundParameters);
 
-                $this->getPaymentDriver()->refund($request, $this->payment, $refundParameters);
+                $refundResponse = $this->getPaymentDriver()->refund($request, $this->payment, $refundParameters);
 
-                // todo check status, if error set error status
+                if (!$refundResponse->isSuccessful()) {
+                    $this->setError($refundResponse->getMessage());
+                }
             }
             else {
                 $this->setSuccessful();
@@ -155,6 +157,11 @@ class PaymentProcessor
 
     public function callbackRefund(Request $request): self
     {
+        if ($request->get('requestId') !== $this->payment->gateway_request_id || $request->get('refundsUuid') !== $this->payment->gateway_refunds_uuid) {
+            $this->setError('Invalid callback refund parameters.');
+            return $this;
+        }
+
         $callbackResponse = $this->getPaymentDriver()->callbackRefund($request);
 
         if ($callbackResponse->getSuccess()) {
@@ -192,7 +199,7 @@ class PaymentProcessor
     private function setRefunded(): void
     {
         $this->setPaymentStatus(PaymentStatus::REFUNDED());
-        event(new PaymentSuccess($this->payment->user, $this->payment)); // todo oznaczenie jako opłacone
+        event(new PaymentSuccess($this->payment->user, $this->payment));
     }
 
     private function setError(string $message, string $code = '0'): void

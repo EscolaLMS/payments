@@ -30,6 +30,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $redirect_url
  * @property boolean|null $recursive
  * @property boolean|null $refund
+ * @property boolean|null $gateway_request_id
+ * @property boolean|null $gateway_refunds_uuid
  * @property-read Model|\Eloquent $payable
  * @property-read \EscolaLms\Payments\Models\User|null $user
  * @method static \Database\Factories\EscolaLms\Payments\Models\PaymentFactory factory(...$parameters)

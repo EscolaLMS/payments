@@ -7,6 +7,7 @@ use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
 use EscolaLms\Payments\Gateway\Responses\CallbackRefundResponse;
 use EscolaLms\Payments\Gateway\Responses\CallbackResponse;
 use EscolaLms\Payments\Gateway\Responses\Przelewy24GatewayResponse;
+use EscolaLms\Payments\Gateway\Responses\Przelewy24RefundResponse;
 use EscolaLms\Payments\Models\Payment;
 use Illuminate\Http\Request;
 use Omnipay\Common\Message\ResponseInterface;
@@ -40,12 +41,10 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
 
         try {
             if ($this->hasRecursiveSubscription($parameters)) {
-                $response = $this->recursiveTransaction($payment, $parameters);
-            }
-            else {
-                $response = $this->transaction($payment, $parameters);
+                $parameters += ['channel' => TransactionChannel::CARDS_ONLY->value];
             }
 
+            $response = $this->transaction($payment, $parameters);
         } catch (Przelewy24Exception $exception) {
             return Przelewy24GatewayResponse::fromApiResponseException($exception);
         }
@@ -80,30 +79,15 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
             email: $parameters['email'],
             urlReturn: $parameters['return_url'],
             currency: Przelewy24Currency::tryFrom($payment->currency) ?? Przelewy24Currency::PLN,
-            urlStatus: 'https://webhook-test.com/13d9c3a443a8812727d4700be3fad14e',
-            //urlStatus: route('payments-gateway-callback', ['payment' => $payment->getKey()]),
+            urlStatus: route('payments-gateway-callback', ['payment' => $payment->getKey()]),
+            channel: !empty($parameters['channel']) ? TransactionChannel::CARDS_ONLY->value : TransactionChannel::ALL_24_7,
         );
     }
 
-    private function recursiveTransaction(Payment $payment, array $parameters = []): RegisterTransactionResponse
-    {
-        return $this->gateway->transactions()->register(
-            sessionId: ($payment->order_id ? $payment->order_id . '_' : '') . $payment->getKey() . $payment->created_at->timestamp,
-            amount: $payment->amount,
-            description: !empty($payment->description) ? $payment->description : 'Payment',
-            email: $parameters['email'],
-            urlReturn: $parameters['return_url'],
-            currency: Przelewy24Currency::tryFrom($payment->currency) ?? Przelewy24Currency::PLN,
-            urlStatus: 'https://webhook-test.com/7f9d02b905914e557a5bf05963514140',
-            //urlStatus: route('payments-gateway-callback', ['payment' => $payment->getKey()]),
-            channel: TransactionChannel::CARDS_ONLY->value,
-        );
-    }
-
-    public function refund(Request $request, Payment $payment, array $parameters = [])
+    public function refund(Request $request, Payment $payment, array $parameters = []): ResponseInterface
     {
         try {
-            $response = $this->gateway->transactions()->refund(
+            $res = $this->gateway->transactions()->refund(
                 requestId: $parameters['gateway_request_id'],
                 refunds: [
                     new RefundItem(
@@ -113,13 +97,12 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
                     )
                 ],
                 refundsUuid: $parameters['gateway_refunds_uuid'],
-                urlStatus: 'https://webhook-test.com/7f9d02b905914e557a5bf05963514140',
+                urlStatus: route('payments-gateway-refund-callback', ['payment' => $payment->getKey()]),
             );
 
-            //return Przelewy24RefundResponse::fromRegisterTransactionResponse($response);
+            return Przelewy24RefundResponse::from($parameters['gateway_request_id'], $parameters['gateway_refunds_uuid']);
         } catch (Przelewy24Exception $exception) {
-            //return Przelewy24RefundResponse::fromApiResponseException($exception);
-            dd($exception);
+            return Przelewy24RefundResponse::fromApiResponseException($exception);
         }
     }
 
@@ -127,9 +110,6 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
     {
         try {
             $refundNotification = $this->gateway->handleRefundWebhook($request->input());
-
-            // todo check status, requestId, refundUUid
-
             return new CallbackRefundResponse(true, $refundNotification->orderId(), $refundNotification->requestId(), $refundNotification->refundsUuid());
         } catch (Przelewy24Exception $exception) {
             return new CallbackRefundResponse(false, null, null, null, $exception->getMessage());

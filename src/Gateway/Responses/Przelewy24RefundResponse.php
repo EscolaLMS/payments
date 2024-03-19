@@ -19,16 +19,15 @@ class Przelewy24RefundResponse implements ResponseInterface
         $this->success = $success;
         $this->request_id = $request_id;
         $this->refunds_uuid = $refunds_uuid;
-        $this->message = $message;
+        $this->message = $message ?? __('Transaction refunded');
     }
 
-    public static function fromRegisterTransactionResponse(TransactionRefundResponse $response): self
+    public static function from(string $request_id, string $refunds_uuid): self
     {
         return new self(
             true,
-            null,
-            null,
-            __('Transaction registered'),
+            $request_id,
+            $refunds_uuid
         );
     }
 
@@ -40,11 +39,6 @@ class Przelewy24RefundResponse implements ResponseInterface
             null,
             $exception->getMessage(),
         );
-    }
-
-    public function getSuccess(): bool
-    {
-        return $this->success;
     }
 
     public function getRequestId(): string
@@ -73,7 +67,7 @@ class Przelewy24RefundResponse implements ResponseInterface
 
     public function isSuccessful()
     {
-        return false;
+        return $this->success;
     }
 
     public function isRedirect()

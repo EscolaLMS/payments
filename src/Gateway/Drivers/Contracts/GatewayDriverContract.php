@@ -14,7 +14,7 @@ interface GatewayDriverContract
     public function callback(Request $request, array $parameters = []): CallbackResponse;
     public function callbackRefund(Request $request, array $parameters = []): CallbackRefundResponse;
 
-    public function refund(Request $request, Payment $payment, array $parameters = []);
+    public function refund(Request $request, Payment $payment, array $parameters = []): ResponseInterface;
 
     public static function requiredParameters(): array;
 
