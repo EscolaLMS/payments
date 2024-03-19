@@ -7,7 +7,6 @@ use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Events\PaymentCancelled;
 use EscolaLms\Payments\Events\PaymentFailed;
-use EscolaLms\Payments\Events\PaymentRequiresRedirect;
 use EscolaLms\Payments\Events\PaymentSuccess;
 use EscolaLms\Payments\Facades\PaymentGateway;
 use EscolaLms\Payments\Facades\Payments;
@@ -15,6 +14,7 @@ use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
 use EscolaLms\Payments\Models\Payment;
 use Illuminate\Http\Request;
 use Omnipay\Common\Message\RedirectResponseInterface;
+use Ramsey\Uuid\Nonstandard\Uuid;
 
 class PaymentProcessor
 {
@@ -80,19 +80,14 @@ class PaymentProcessor
         return $this->payment->driver ?? PaymentGateway::getDefaultDriver();
     }
 
-    public function savePayment(): self
+    public function savePayment(array $parameters = []): self
     {
-        $this->payment->save();
+        $this->payment->save($parameters);
         return $this;
     }
 
     public function purchase(array $parameters = []): self
     {
-        // stripe throw error unsupported !!
-        // todo $paramters['subs'], $paramters['trial'], $paramters['recursive'] itp
-
-
-
         $driver = $parameters['gateway'] ?? null;
         if (!is_null($driver) && Payments::isDriverEnabled($driver)) {
             $this->setPaymentDriverName($driver);
@@ -100,9 +95,11 @@ class PaymentProcessor
             $this->setPaymentDriverName($this->getPaymentDriverName());
         }
 
+        $this->setRefund($parameters);
         $this->savePayment();
 
         $response = $this->getPaymentDriver()->purchase($this->payment, $parameters);
+
         if ($response->isSuccessful()) {
             $this->setSuccessful();
         } elseif ($response->isRedirect()) {
@@ -128,7 +125,34 @@ class PaymentProcessor
         $this->setGatewayOrderId($callbackResponse->getGatewayOrderId());
 
         if ($callbackResponse->getSuccess()) {
-            $this->setSuccessful();
+            if ($this->payment->refund) {
+                $refundParameters = [
+                    'gateway_request_id' => Uuid::uuid4(),
+                    'gateway_refunds_uuid' => Uuid::uuid4()
+                ];
+
+                $this->savePayment($refundParameters);
+
+                $this->getPaymentDriver()->refund($request, $this->payment, $refundParameters);
+
+                // todo check status, if error set error status
+            }
+            else {
+                $this->setSuccessful();
+            }
+        } else {
+            $this->setError($callbackResponse->getError());
+        }
+
+        return $this;
+    }
+
+    public function callbackRefund(Request $request): self
+    {
+        $callbackResponse = $this->getPaymentDriver()->callbackRefund($request);
+
+        if ($callbackResponse->getSuccess()) {
+            $this->setRefunded();
         } else {
             $this->setError($callbackResponse->getError());
         }
@@ -159,10 +183,30 @@ class PaymentProcessor
         event(new PaymentCancelled($this->payment->user, $this->payment));
     }
 
+    private function setRefunded(): void
+    {
+        $this->setPaymentStatus(PaymentStatus::REFUNDED());
+        event(new PaymentSuccess($this->payment->user, $this->payment)); // todo oznaczenie jako opłacone
+    }
+
     private function setError(string $message, string $code = '0'): void
     {
         $this->setPaymentStatus(PaymentStatus::FAILED());
         event(new PaymentFailed($this->payment->user, $this->payment, $code, $message));
+    }
+
+    private function setRecursive(array $parameters = []): void
+    {
+        if (isset($parameters['recursive'])) {
+            $this->payment->recursive = $parameters['recursive'] === true;
+        }
+    }
+
+    private function setRefund(array $parameters = []): void
+    {
+        if (isset($parameters['has_trial'])) {
+            $this->payment->refund = $parameters['has_trial'] === true;
+        }
     }
 
     public function isNew(): bool

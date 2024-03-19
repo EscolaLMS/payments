@@ -3,8 +3,8 @@
 namespace EscolaLms\Payments\Gateway\Drivers;
 
 use EscolaLms\Payments\Entities\PaymentsConfig;
-use EscolaLms\Payments\Facades\Payments;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
+use EscolaLms\Payments\Gateway\Responses\CallbackRefundResponse;
 use EscolaLms\Payments\Gateway\Responses\CallbackResponse;
 use EscolaLms\Payments\Gateway\Responses\Przelewy24GatewayResponse;
 use EscolaLms\Payments\Models\Payment;
@@ -16,7 +16,6 @@ use Przelewy24\Enums\Currency as Przelewy24Currency;
 use Przelewy24\Enums\TransactionChannel;
 use Przelewy24\Exceptions\Przelewy24Exception;
 use Przelewy24\Przelewy24;
-use Ramsey\Uuid\Uuid;
 
 class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
 {
@@ -47,8 +46,7 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
         $this->throwExceptionIfMissingParameters($parameters);
 
         try {
-
-            if (isset($parameters['type']) && in_array($parameters['type'], ['subscription', 'subscription-all-in']) && isset($parameters['recursive']) && $parameters['recursive'] === true) {
+            if ($this->hasSubscription($parameters)) {
                 $response = $this->recursiveTransaction($payment, $parameters);
             }
             else {
@@ -74,9 +72,6 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
                 currency: $callbackNotification->currency(),
             );
 
-            //dd($callbackNotification, $response);
-
-
             return new CallbackResponse(true, $callbackNotification->orderId());
         } catch (Przelewy24Exception $exception) {
             return new CallbackResponse(false, $callbackNotification->orderId(), $exception->getMessage());
@@ -86,41 +81,66 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
     private function transaction(Payment $payment, array $parameters = []): RegisterTransactionResponse
     {
         return $this->gateway->transactions()->register(
-            sessionId: ($payment->order_id ? $payment->order_id . '_' : '') . $payment->getKey() . now()->timestamp,
+            sessionId: ($payment->order_id ? $payment->order_id . '_' : '') . $payment->getKey() . $payment->created_at->timestamp,
             amount: $payment->amount,
             description: !empty($payment->description) ? $payment->description : 'Payment',
             email: $parameters['email'],
             urlReturn: $parameters['return_url'],
             currency: Przelewy24Currency::tryFrom($payment->currency) ?? Przelewy24Currency::PLN,
-            urlStatus: 'https://webhook-test.com/b12b316c0984853f787c0959f39e365e',
+            urlStatus: 'https://webhook-test.com/13d9c3a443a8812727d4700be3fad14e',
             //urlStatus: route('payments-gateway-callback', ['payment' => $payment->getKey()]),
-            urlCardPaymentNotification: 'https://webhook-test.com/b12b316c0984853f787c0959f39e365e',
         );
     }
 
     private function recursiveTransaction(Payment $payment, array $parameters = []): RegisterTransactionResponse
     {
-        $transaction = $this->gateway->transactions()->register(
-            sessionId: ($payment->order_id ? $payment->order_id . '_' : '') . $payment->getKey() . now()->timestamp,
+        return $this->gateway->transactions()->register(
+            sessionId: ($payment->order_id ? $payment->order_id . '_' : '') . $payment->getKey() . $payment->created_at->timestamp,
             amount: $payment->amount,
             description: !empty($payment->description) ? $payment->description : 'Payment',
             email: $parameters['email'],
             urlReturn: $parameters['return_url'],
             currency: Przelewy24Currency::tryFrom($payment->currency) ?? Przelewy24Currency::PLN,
-            urlStatus: 'https://webhook-test.com/b12b316c0984853f787c0959f39e365e',
+            urlStatus: 'https://webhook-test.com/13d9c3a443a8812727d4700be3fad14e',
             //urlStatus: route('payments-gateway-callback', ['payment' => $payment->getKey()]),
             channel: TransactionChannel::CARDS_ONLY->value,
         );
+    }
 
+    public function refund(Request $request, Payment $payment, array $parameters = [])
+    {
+        try {
+            $response = $this->gateway->transactions()->refund(
+                requestId: $parameters['gateway_request_id'],
+                refunds: [
+                    new RefundItem(
+                        $payment->gateway_order_id,
+                        ($payment->order_id ? $payment->order_id . '_' : '') . $payment->getKey() . $payment->created_at->timestamp,
+                        $payment->amount
+                    )
+                ],
+                refundsUuid: $parameters['gateway_refunds_uuid'],
+                urlStatus: 'https://webhook-test.com/13d9c3a443a8812727d4700be3fad14e',
+            );
 
+            //return Przelewy24RefundResponse::fromRegisterTransactionResponse($response);
+        } catch (Przelewy24Exception $exception) {
+            //return Przelewy24RefundResponse::fromApiResponseException($exception);
+            dd($exception);
+        }
+    }
 
+    public function callbackRefund(Request $request, array $parameters = []): CallbackRefundResponse
+    {
+        try {
+            $refundNotification = $this->gateway->handleRefundWebhook($request->input());
 
-        $response = $this->transaction($payment, $parameters);
+            // todo check status, requestId, refundUUid
 
-        $response = $this->gateway->cards()->cardInfo("4296014872");
-        $transaction = $this->transaction($payment, $parameters);
-
-        $response = $this->gateway->cards()->cardCharge($transaction->token());
+            return new CallbackRefundResponse(true, $refundNotification->orderId(), $refundNotification->requestId(), $refundNotification->refundsUuid());
+        } catch (Przelewy24Exception $exception) {
+            return new CallbackRefundResponse(false, null, null, null, $exception->getMessage());
+        }
     }
 
     public static function requiredParameters(): array
@@ -129,5 +149,17 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
             'return_url',
             'email'
         ];
+    }
+
+    private function hasSubscription(array $parameters = []): bool
+    {
+        if (!$parameters) {
+            return false;
+        }
+
+        return isset($parameters['type'])
+            && in_array($parameters['type'], ['subscription', 'subscription-all-in'])
+            && isset($parameters['recursive'])
+            && $parameters['recursive'] === true;
     }
 }
