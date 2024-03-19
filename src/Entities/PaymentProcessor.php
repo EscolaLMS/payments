@@ -133,8 +133,8 @@ class PaymentProcessor
         if ($callbackResponse->getSuccess()) {
             if ($this->payment->refund) {
                 $refundParameters = [
-                    'gateway_request_id' => Uuid::uuid4(),
-                    'gateway_refunds_uuid' => Uuid::uuid4()
+                    'gateway_request_id' => Uuid::uuid4()->toString(),
+                    'gateway_refunds_uuid' => Uuid::uuid4()->toString()
                 ];
 
                 $this->updatePayment($refundParameters);
@@ -157,7 +157,11 @@ class PaymentProcessor
 
     public function callbackRefund(Request $request): self
     {
-        if ($request->get('requestId') !== $this->payment->gateway_request_id || $request->get('refundsUuid') !== $this->payment->gateway_refunds_uuid) {
+        if (
+            !$request->has('requestId') || !$request->has('refundsUuid')
+            || $request->get('requestId') !== $this->payment->gateway_request_id
+            || $request->get('refundsUuid') !== $this->payment->gateway_refunds_uuid
+        ) {
             $this->setError('Invalid callback refund parameters.');
             return $this;
         }

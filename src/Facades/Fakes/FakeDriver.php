@@ -62,8 +62,8 @@ class FakeDriver extends AbstractDriver implements GatewayDriverContract
         return new CallbackRefundResponse();
     }
 
-    public function refund(Request $request, Payment $payment, array $parameters = [])
+    public function refund(Request $request, Payment $payment, array $parameters = []): ResponseInterface
     {
-        return new CallbackRefundResponse();
+        return new NoneGatewayResponse();
     }
 }
