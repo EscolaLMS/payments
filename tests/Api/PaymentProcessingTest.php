@@ -13,17 +13,19 @@ use EscolaLms\Payments\Exceptions\PaymentException;
 use EscolaLms\Payments\Exceptions\ProcessingError;
 use EscolaLms\Payments\Facades\PaymentGateway;
 use EscolaLms\Payments\Tests\Mocks\Payable;
+use EscolaLms\Payments\Tests\TestCase;
 use EscolaLms\Payments\Tests\Traits\CreatesBillable;
 use EscolaLms\Payments\Tests\Traits\CreatesPaymentMethods;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 
-class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
+class PaymentProcessingTest extends TestCase
 {
     use CreatesPaymentMethods;
     use CreatesBillable;
 
-    public function testPayableCanBecomePayment()
+    public function testPayableCanBecomePayment(): void
     {
         Event::fake([PaymentRegistered::class]);
         $billable = $this->createBillableStudent();
@@ -40,7 +42,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         $this->assertEquals($payable->getUser()->getKey(), $payment->user->getKey());
     }
 
-    public function testPayableCanBecomePaymentAndBePaidUsingMockedStripe()
+    public function testPayableCanBecomePaymentAndBePaidUsingMockedStripe(): void
     {
         PaymentGateway::fake();
 
@@ -78,7 +80,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         ]);
     }
 
-    public function testPayableCanBecomePaymentAndBePaidUsingMockedP24()
+    public function testPayableCanBecomePaymentAndBePaidUsingMockedP24(): void
     {
         PaymentGateway::fake();
 
@@ -115,7 +117,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         ]);
     }
 
-    public function testPayableCanBecomePaymentAndBePaidUsingStripe()
+    public function testPayableCanBecomePaymentAndBePaidUsingStripe(): void
     {
         $this->markTestSkipped(
             'This test calls external (Stripe) api, we probably should not run it automatically every time we run test suite'
@@ -145,7 +147,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         ]);
     }
 
-    public function testPayableCanBecomePaymentAndWillRequireRedirectUsingPrzelewy24()
+    public function testPayableCanBecomePaymentAndWillRequireRedirectUsingPrzelewy24(): void
     {
         $this->markTestSkipped(
             'This test calls external (Przelewy24) api, we probably should not run it automatically every time we run test suite'
@@ -173,7 +175,7 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
         ]);
     }
 
-    public function testPaymentShouldFailAndThrowExceptionUsingStripe()
+    public function testPaymentShouldFailAndThrowExceptionUsingStripe(): void
     {
         $this->markTestSkipped(
             'This test calls external (Stripe) api, we probably should not run it automatically every time we run test suite'
@@ -209,5 +211,84 @@ class PaymentProcessingTest extends \EscolaLms\Payments\Tests\TestCase
             $this->assertEquals(PaymentStatus::FAILED(), $payment->status);
             Event::assertDispatched(PaymentFailed::class);
         }
+    }
+
+    public function testPayableCanBecomePaymentAndBePaidUsingMockedP24WithRefund(): void
+    {
+        PaymentGateway::fake();
+
+        Event::fake([PaymentRegistered::class]);
+        $billable = $this->createBillableStudent();
+        $payable = new Payable(1000, Currency::USD(), 'asdf', 1337);
+        $payable->setUser($billable);
+
+        $processor = $payable->process();
+        Event::assertDispatched(PaymentRegistered::class);
+        $payment = $processor->getPayment();
+        $this->assertEquals(PaymentStatus::NEW(), $payment->status);
+
+        $processor->purchase(['gateway' => 'przelewy24', 'email' => 'test@localhost', 'return_url' => 'https://localhost.test', 'has_trial' => true]);
+        $payment->refresh();
+
+        $this->assertTrue($payment->refund);
+        $this->assertEquals(PaymentStatus::PAID(), $payment->status);
+    }
+
+    public function testPayableRefundCompleteP24Fake(): void
+    {
+        PaymentGateway::fake();
+
+        $billable = $this->createBillableStudent();
+        $payable = new Payable(1000, Currency::USD(), 'asdf', 1337);
+        $payable->setUser($billable);
+
+        $processor = $payable->process();
+        $payment = $processor->getPayment();
+        $this->assertEquals(PaymentStatus::NEW(), $payment->status);
+
+        $processor->purchase(['gateway' => 'przelewy24', 'email' => 'test@localhost', 'return_url' => 'https://localhost.test', 'has_trial' => true]);
+
+        $processor->callback(new Request());
+
+        $this->assertTrue($payment->refund);
+        $this->assertNotNull($payment->gateway_request_id);
+        $this->assertNotNull($payment->gateway_refunds_uuid);
+        $this->assertEquals(PaymentStatus::PAID(), $payment->status);
+
+        $processor->callbackRefund((new Request())->replace([
+            'requestId' => $payment->gateway_request_id,
+            'refundsUuid' => $payment->gateway_refunds_uuid
+        ]));
+
+        $this->assertEquals(PaymentStatus::REFUNDED(), $payment->status);
+    }
+
+    public function testPayableRefundInvalidDataP24Fake(): void
+    {
+        PaymentGateway::fake();
+
+        $billable = $this->createBillableStudent();
+        $payable = new Payable(1000, Currency::USD(), 'asdf', 1337);
+        $payable->setUser($billable);
+
+        $processor = $payable->process();
+        $payment = $processor->getPayment();
+        $this->assertEquals(PaymentStatus::NEW(), $payment->status);
+
+        $processor->purchase(['gateway' => 'przelewy24', 'email' => 'test@localhost', 'return_url' => 'https://localhost.test', 'has_trial' => true]);
+
+        $processor->callback(new Request());
+
+        $this->assertTrue($payment->refund);
+        $this->assertNotNull($payment->gateway_request_id);
+        $this->assertNotNull($payment->gateway_refunds_uuid);
+        $this->assertEquals(PaymentStatus::PAID(), $payment->status);
+
+        $processor->callbackRefund((new Request())->replace([
+            'requestId' => 'invalid_request_id',
+            'refundsUuid' => 'invalid_refunds_uuid'
+        ]));
+
+        $this->assertEquals(PaymentStatus::FAILED(), $payment->status);
     }
 }

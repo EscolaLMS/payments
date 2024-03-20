@@ -28,6 +28,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $driver
  * @property string|null $gateway_order_id
  * @property string|null $redirect_url
+ * @property boolean|null $recursive
+ * @property boolean|null $refund
+ * @property string|null $gateway_request_id
+ * @property string|null $gateway_refunds_uuid
  * @property-read Model|\Eloquent $payable
  * @property-read \EscolaLms\Payments\Models\User|null $user
  * @method static \Database\Factories\EscolaLms\Payments\Models\PaymentFactory factory(...$parameters)
@@ -62,6 +66,7 @@ class Payment extends Model implements PaymentSchema
     protected $casts = [
         'currency' => Currency::class,
         'status' => PaymentStatus::class,
+        'refund' => 'boolean',
     ];
 
     public function payable(): MorphTo

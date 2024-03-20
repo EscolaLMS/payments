@@ -2,17 +2,17 @@
 
 namespace EscolaLms\Payments\Tests\Api;
 
-use EscolaLms\Core\Tests\CreatesUsers;
 use EscolaLms\Payments\Facades\Payments;
 use EscolaLms\Payments\Gateway\Drivers\Przelewy24Driver;
 use EscolaLms\Payments\Gateway\Drivers\StripeDriver;
+use EscolaLms\Payments\Tests\TestCase;
 use EscolaLms\Payments\Tests\Traits\CreatesBillable;
 
-class PaymentGatewayTest extends \EscolaLms\Payments\Tests\TestCase
+class PaymentGatewayTest extends TestCase
 {
     use CreatesBillable;
 
-    public function testStudentCanListGatewaysWithRequiredParams()
+    public function testStudentCanListGatewaysWithRequiredParams(): void
     {
         $billable = $this->createBillableStudent();
 

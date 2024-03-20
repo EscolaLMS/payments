@@ -7,6 +7,7 @@ use EscolaLms\Payments\Gateway\Drivers\AbstractDriver;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
 use EscolaLms\Payments\Gateway\Drivers\Przelewy24Driver;
 use EscolaLms\Payments\Gateway\Drivers\StripeDriver;
+use EscolaLms\Payments\Gateway\Responses\CallbackRefundResponse;
 use EscolaLms\Payments\Gateway\Responses\CallbackResponse;
 use EscolaLms\Payments\Gateway\Responses\NoneGatewayResponse;
 use EscolaLms\Payments\Models\Payment;
@@ -54,5 +55,15 @@ class FakeDriver extends AbstractDriver implements GatewayDriverContract
     public function getRequestedDriver(): ?string
     {
         return $this->requested_driver;
+    }
+
+    public function callbackRefund(Request $request, array $parameters = []): CallbackRefundResponse
+    {
+        return new CallbackRefundResponse();
+    }
+
+    public function refund(Request $request, Payment $payment, array $parameters = []): ResponseInterface
+    {
+        return new NoneGatewayResponse();
     }
 }

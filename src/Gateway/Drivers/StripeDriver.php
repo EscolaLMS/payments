@@ -4,11 +4,13 @@ namespace EscolaLms\Payments\Gateway\Drivers;
 
 use EscolaLms\Payments\Dtos\PaymentDto;
 use EscolaLms\Payments\Entities\PaymentsConfig;
+use EscolaLms\Payments\Exceptions\ActionNotSupported;
 use EscolaLms\Payments\Exceptions\CardDeclined;
 use EscolaLms\Payments\Exceptions\ExpiredCard;
 use EscolaLms\Payments\Exceptions\IncorrectCvc;
 use EscolaLms\Payments\Exceptions\ProcessingError;
 use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
+use EscolaLms\Payments\Gateway\Responses\CallbackRefundResponse;
 use EscolaLms\Payments\Gateway\Responses\CallbackResponse;
 use EscolaLms\Payments\Models\Payment;
 use Illuminate\Http\Request;
@@ -77,5 +79,15 @@ class StripeDriver extends AbstractDriver implements GatewayDriverContract
             default:
                 parent::throwExceptionForResponse($response);
         };
+    }
+
+    public function callbackRefund(Request $request, array $parameters = []): CallbackRefundResponse
+    {
+        return new CallbackRefundResponse();
+    }
+
+    public function refund(Request $request, Payment $payment, array $parameters = []): ResponseInterface
+    {
+        return throw new ActionNotSupported();
     }
 }

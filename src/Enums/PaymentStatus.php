@@ -10,6 +10,7 @@ use EscolaLms\Core\Enums\BasicEnum;
  * @method static static CANCELLED()
  * @method static static FAILED()
  * @method static static REQUIRES_REDIRECT()
+ * @method static static REFUNDED()
  */
 class PaymentStatus extends BasicEnum
 {
@@ -18,4 +19,5 @@ class PaymentStatus extends BasicEnum
     public const CANCELLED         = 'cancelled';
     public const FAILED            = 'failed';
     public const REQUIRES_REDIRECT = 'redirect';
+    public const REFUNDED          = 'refunded';
 }

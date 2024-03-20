@@ -7,7 +7,6 @@ use EscolaLms\Payments\Enums\Currency;
 use EscolaLms\Payments\Enums\PaymentStatus;
 use EscolaLms\Payments\Events\PaymentCancelled;
 use EscolaLms\Payments\Events\PaymentFailed;
-use EscolaLms\Payments\Events\PaymentRequiresRedirect;
 use EscolaLms\Payments\Events\PaymentSuccess;
 use EscolaLms\Payments\Facades\PaymentGateway;
 use EscolaLms\Payments\Facades\Payments;
@@ -15,6 +14,7 @@ use EscolaLms\Payments\Gateway\Drivers\Contracts\GatewayDriverContract;
 use EscolaLms\Payments\Models\Payment;
 use Illuminate\Http\Request;
 use Omnipay\Common\Message\RedirectResponseInterface;
+use Ramsey\Uuid\Nonstandard\Uuid;
 
 class PaymentProcessor
 {
@@ -86,6 +86,12 @@ class PaymentProcessor
         return $this;
     }
 
+    public function updatePayment(array $parameters = []): self
+    {
+        $this->payment->update($parameters);
+        return $this;
+    }
+
     public function purchase(array $parameters = []): self
     {
         $driver = $parameters['gateway'] ?? null;
@@ -95,9 +101,11 @@ class PaymentProcessor
             $this->setPaymentDriverName($this->getPaymentDriverName());
         }
 
+        $this->setRefund($parameters);
         $this->savePayment();
 
         $response = $this->getPaymentDriver()->purchase($this->payment, $parameters);
+
         if ($response->isSuccessful()) {
             $this->setSuccessful();
         } elseif ($response->isRedirect()) {
@@ -123,7 +131,45 @@ class PaymentProcessor
         $this->setGatewayOrderId($callbackResponse->getGatewayOrderId());
 
         if ($callbackResponse->getSuccess()) {
-            $this->setSuccessful();
+            if ($this->payment->refund) {
+                $refundParameters = [
+                    'gateway_request_id' => Uuid::uuid4()->toString(),
+                    'gateway_refunds_uuid' => Uuid::uuid4()->toString()
+                ];
+
+                $this->updatePayment($refundParameters);
+
+                $refundResponse = $this->getPaymentDriver()->refund($request, $this->payment, $refundParameters);
+
+                if (!$refundResponse->isSuccessful()) {
+                    $this->setError($refundResponse->getMessage());
+                }
+            }
+            else {
+                $this->setSuccessful();
+            }
+        } else {
+            $this->setError($callbackResponse->getError());
+        }
+
+        return $this;
+    }
+
+    public function callbackRefund(Request $request): self
+    {
+        if (
+            !$request->has('requestId') || !$request->has('refundsUuid')
+            || $request->get('requestId') !== $this->payment->gateway_request_id
+            || $request->get('refundsUuid') !== $this->payment->gateway_refunds_uuid
+        ) {
+            $this->setError('Invalid callback refund parameters.');
+            return $this;
+        }
+
+        $callbackResponse = $this->getPaymentDriver()->callbackRefund($request);
+
+        if ($callbackResponse->getSuccess()) {
+            $this->setRefunded();
         } else {
             $this->setError($callbackResponse->getError());
         }
@@ -154,10 +200,30 @@ class PaymentProcessor
         event(new PaymentCancelled($this->payment->user, $this->payment));
     }
 
+    private function setRefunded(): void
+    {
+        $this->setPaymentStatus(PaymentStatus::REFUNDED());
+        event(new PaymentSuccess($this->payment->user, $this->payment));
+    }
+
     private function setError(string $message, string $code = '0'): void
     {
         $this->setPaymentStatus(PaymentStatus::FAILED());
         event(new PaymentFailed($this->payment->user, $this->payment, $code, $message));
+    }
+
+    private function setRecursive(array $parameters = []): void
+    {
+        if (isset($parameters['recursive'])) {
+            $this->payment->recursive = $parameters['recursive'] === true;
+        }
+    }
+
+    private function setRefund(array $parameters = []): void
+    {
+        if (isset($parameters['has_trial'])) {
+            $this->payment->refund = $parameters['has_trial'] === true;
+        }
     }
 
     public function isNew(): bool

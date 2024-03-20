@@ -18,11 +18,26 @@ class GatewayController extends EscolaLmsBaseController
     public function callback(Request $request): JsonResponse
     {
         $payment = Payments::findPayment((int) $request->route('payment'));
+
         if (is_null($payment)) {
             Log::error(__('Callback called for undefined payment :id', ['id' => $request->route('payment')]));
             return $this->sendError(__('Payment not found'), 404);
         }
+
         Payments::processPayment($payment)->callback($request);
+        return $this->sendSuccess('OK');
+    }
+
+    public function callbackRefund(Request $request): JsonResponse
+    {
+        $payment = Payments::findPayment((int) $request->route('payment'));
+
+        if (is_null($payment)) {
+            Log::error(__('Callback called for undefined payment :id', ['id' => $request->route('payment')]));
+            return $this->sendError(__('Payment not found'), 404);
+        }
+
+        Payments::processPayment($payment)->callbackRefund($request);
         return $this->sendSuccess('OK');
     }
 }
