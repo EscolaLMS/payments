@@ -8,7 +8,7 @@
         "escolalms/core": "^1",
         "league/omnipay": "^3",
         "omnipay/stripe": "^3.1",
-        "mnastalski/przelewy24-php": "^v1.2.0",
+        "mnastalski/przelewy24-php": "dev-fix/18-transaction-refund",
         "maatwebsite/excel": "^3.1"
     },
     "require-dev": {
@@ -73,14 +73,8 @@
     },
     "repositories": [
         {
-            "type": "path",
-            "name": "mnastalski/przelewy24-php",
-            "url": "../przelewy24-php",
-            "options": {
-                "versions": {
-                    "mnastalski/przelewy24-php": "v1.2.0"
-                }
-            }
+            "type": "vcs",
+            "url": "https://github.com/dbojdo/przelewy24-php"
         }
     ]
 }
