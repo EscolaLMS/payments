@@ -147,9 +147,8 @@ class PaymentProcessor
                     $this->setError($refundResponse->getMessage());
                 }
             }
-            else {
-                $this->setSuccessful();
-            }
+
+            $this->setSuccessful();
         } else {
             $this->setError($callbackResponse->getError());
         }
