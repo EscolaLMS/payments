@@ -83,7 +83,7 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
             email: $parameters['email'],
             urlReturn: $parameters['return_url'] ?? null,
             currency: Przelewy24Currency::tryFrom($payment->currency) ?? Przelewy24Currency::PLN,
-            urlStatus: 'https://webhook-test.com/20126e328281afa8a16ce7598c99902b',
+            urlStatus: route('payments-gateway-callback', ['payment' => $payment->getKey()]),
             channel: !empty($parameters['channel']) ? TransactionChannel::CARDS_ONLY->value : TransactionChannel::ALL_24_7,
             methodRefId: isset($cardInfoResponse) ? $cardInfoResponse->refId() : null
         );
@@ -108,7 +108,7 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
                     )
                 ],
                 refundsUuid: $parameters['gateway_refunds_uuid'],
-                urlStatus: 'https://webhook-test.com/20126e328281afa8a16ce7598c99902b'
+                urlStatus: route('payments-gateway-refund-callback', ['payment' => $payment->getKey()]),
             );
 
             return Przelewy24RefundResponse::from($parameters['gateway_request_id'], $parameters['gateway_refunds_uuid']);
