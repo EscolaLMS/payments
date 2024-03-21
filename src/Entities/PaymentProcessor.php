@@ -95,6 +95,7 @@ class PaymentProcessor
     public function purchase(array $parameters = []): self
     {
         $driver = $parameters['gateway'] ?? null;
+
         if (!is_null($driver) && Payments::isDriverEnabled($driver)) {
             $this->setPaymentDriverName($driver);
         } else {
@@ -129,6 +130,7 @@ class PaymentProcessor
 
         $this->clearRedirect();
         $this->setGatewayOrderId($callbackResponse->getGatewayOrderId());
+
 
         if ($callbackResponse->getSuccess()) {
             if ($this->payment->refund) {

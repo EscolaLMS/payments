@@ -72,16 +72,27 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
 
     private function transaction(Payment $payment, array $parameters = []): RegisterTransactionResponse
     {
-        return $this->gateway->transactions()->register(
+        if (isset($parameters['gateway_order_id'])) {
+            $cardInfoResponse = $this->gateway->cards()->cardInfo($parameters['gateway_order_id']);
+        }
+
+        $transaction = $this->gateway->transactions()->register(
             sessionId: ($payment->order_id ? $payment->order_id . '_' : '') . $payment->getKey() . $payment->created_at->timestamp,
             amount: $payment->amount,
             description: !empty($payment->description) ? $payment->description : 'Payment',
             email: $parameters['email'],
-            urlReturn: $parameters['return_url'],
+            urlReturn: $parameters['return_url'] ?? null,
             currency: Przelewy24Currency::tryFrom($payment->currency) ?? Przelewy24Currency::PLN,
             urlStatus: route('payments-gateway-callback', ['payment' => $payment->getKey()]),
             channel: !empty($parameters['channel']) ? TransactionChannel::CARDS_ONLY->value : TransactionChannel::ALL_24_7,
+            methodRefId: isset($cardInfoResponse) ? $cardInfoResponse->refId() : null
         );
+
+        if (isset($parameters['gateway_order_id'])) {
+            $this->gateway->cards()->cardCharge($transaction->token());
+        }
+
+        return $transaction;
     }
 
     public function refund(Request $request, Payment $payment, array $parameters = []): ResponseInterface
