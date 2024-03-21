@@ -146,9 +146,11 @@ class PaymentProcessor
                 if (!$refundResponse->isSuccessful()) {
                     $this->setError($refundResponse->getMessage());
                 }
-            }
 
-            $this->setSuccessful();
+                event(new PaymentSuccess($this->payment->user, $this->payment));
+            } else {
+                $this->setSuccessful();
+            }
         } else {
             $this->setError($callbackResponse->getError());
         }
@@ -204,20 +206,12 @@ class PaymentProcessor
     private function setRefunded(): void
     {
         $this->setPaymentStatus(PaymentStatus::REFUNDED());
-        event(new PaymentSuccess($this->payment->user, $this->payment));
     }
 
     private function setError(string $message, string $code = '0'): void
     {
         $this->setPaymentStatus(PaymentStatus::FAILED());
         event(new PaymentFailed($this->payment->user, $this->payment, $code, $message));
-    }
-
-    private function setRecursive(array $parameters = []): void
-    {
-        if (isset($parameters['recursive'])) {
-            $this->payment->recursive = $parameters['recursive'] === true;
-        }
     }
 
     private function setRefund(array $parameters = []): void
