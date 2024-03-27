@@ -84,7 +84,7 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
             urlReturn: $parameters['return_url'] ?? url('/'),
             currency: Przelewy24Currency::tryFrom($payment->currency) ?? Przelewy24Currency::PLN,
             urlStatus: route('payments-gateway-callback', ['payment' => $payment->getKey()]),
-            channel: !empty($parameters['channel']) ? TransactionChannel::CARDS_ONLY->value : TransactionChannel::ALL_24_7,
+            channel: !empty($parameters['channel']) ? TransactionChannel::CARDS_ONLY->value : TransactionChannel::ALL_24_7->value,
             methodRefId: isset($cardInfoResponse) ? $cardInfoResponse->refId() : null
         );
 
