@@ -10,8 +10,8 @@ use Przelewy24\Exceptions\Przelewy24Exception;
 class Przelewy24RefundResponse implements ResponseInterface
 {
     private bool $success;
-    private string $request_id;
-    private string $refunds_uuid;
+    private ?string $request_id;
+    private ?string $refunds_uuid;
     private ?string $message;
 
     public function __construct(bool $success = true, ?string $request_id = null, ?string $refunds_uuid = null, ?string $message = '')

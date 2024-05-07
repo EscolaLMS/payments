@@ -102,6 +102,12 @@ class PaymentProcessor
             $this->setPaymentDriverName($this->getPaymentDriverName());
         }
 
+        $currency = $parameters['currency'] ?? null;
+
+        if (!is_null($currency) && Currency::hasValue($currency)) {
+            $this->setCurrency(Currency::fromValue($currency));
+        }
+
         $this->setRefund($parameters);
         $this->savePayment();
 
@@ -130,7 +136,6 @@ class PaymentProcessor
 
         $this->clearRedirect();
         $this->setGatewayOrderId($callbackResponse->getGatewayOrderId());
-
 
         if ($callbackResponse->getSuccess()) {
             if ($this->payment->refund) {

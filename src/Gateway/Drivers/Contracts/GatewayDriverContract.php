@@ -20,4 +20,6 @@ interface GatewayDriverContract
 
     public function throwExceptionForResponse(ResponseInterface $response): void;
     public function throwExceptionIfMissingParameters(array $parameters): void;
+
+    public function ableToRenew(): bool;
 }

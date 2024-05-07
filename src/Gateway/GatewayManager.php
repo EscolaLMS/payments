@@ -6,6 +6,7 @@ use EscolaLms\Payments\Entities\PaymentsConfig;
 use EscolaLms\Payments\Exceptions\GatewayConfigException;
 use EscolaLms\Payments\Gateway\Drivers\FreeDriver;
 use EscolaLms\Payments\Gateway\Drivers\Przelewy24Driver;
+use EscolaLms\Payments\Gateway\Drivers\RevenueCatDriver;
 use EscolaLms\Payments\Gateway\Drivers\StripeDriver;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Manager;
@@ -55,5 +56,13 @@ class GatewayManager extends Manager
             throw new GatewayConfigException(__('Missing Przelewy24 configuration'));
         }
         return new Przelewy24Driver($this->paymentsConfig);
+    }
+
+    public function createRevenueCatDriver(): RevenueCatDriver
+    {
+        if (!$this->paymentsConfig->isRevenueCatEnabled()) {
+            throw new GatewayConfigException(__('RevenueCat payments gateway is disabled'));
+        }
+        return new RevenueCatDriver($this->paymentsConfig);
     }
 }

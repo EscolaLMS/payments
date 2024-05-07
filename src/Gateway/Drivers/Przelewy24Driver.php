@@ -146,4 +146,9 @@ class Przelewy24Driver extends AbstractDriver implements GatewayDriverContract
             && isset($parameters['recursive'])
             && $parameters['recursive'] === true;
     }
+
+    public function ableToRenew(): bool
+    {
+        return true;
+    }
 }

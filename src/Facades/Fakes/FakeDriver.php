@@ -66,4 +66,9 @@ class FakeDriver extends AbstractDriver implements GatewayDriverContract
     {
         return new NoneGatewayResponse();
     }
+
+    public function ableToRenew(): bool
+    {
+        return true;
+    }
 }

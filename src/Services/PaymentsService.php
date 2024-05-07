@@ -8,6 +8,7 @@ use EscolaLms\Payments\Contracts\Payable;
 use EscolaLms\Payments\Entities\PaymentsConfig;
 use EscolaLms\Payments\Events\PaymentRegistered;
 use EscolaLms\Payments\Facades\PaymentGateway;
+use EscolaLms\Payments\Gateway\Drivers\RevenueCatDriver;
 use EscolaLms\Payments\Models\Payment;
 use EscolaLms\Payments\Repositories\Contracts\PaymentsRepositoryContract;
 use EscolaLms\Payments\Services\Contracts\PaymentsServiceContract;
@@ -82,7 +83,8 @@ class PaymentsService implements PaymentsServiceContract
     {
         return array_filter([
             'stripe' => $this->getPaymentsConfig()->isStripeEnabled(),
-            'przelewy24' => $this->getPaymentsConfig()->isPrzelewy24Enabled()
+            'przelewy24' => $this->getPaymentsConfig()->isPrzelewy24Enabled(),
+            'revenuecat' => $this->getPaymentsConfig()->isRevenueCatEnabled()
         ], fn (bool $enabled) => $enabled);
     }
 
@@ -98,6 +100,10 @@ class PaymentsService implements PaymentsServiceContract
                 'przelewy24' => [
                     'enabled' => $this->getPaymentsConfig()->isPrzelewy24Enabled(),
                     'parameters' => Przelewy24Driver::requiredParameters()
+                ],
+                'revenuecat' => [
+                    'enabled' => $this->getPaymentsConfig()->isRevenueCatEnabled(),
+                    'parameters' => RevenueCatDriver::requiredParameters()
                 ]
             ]
         ];

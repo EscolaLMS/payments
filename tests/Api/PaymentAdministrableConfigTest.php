@@ -59,6 +59,9 @@ class PaymentAdministrableConfigTest extends TestCase
                     'przelewy24' => [
                         'enabled' => true,
                     ],
+                    'revenuecat' => [
+                        'enabled' => true,
+                    ],
                 ],
                 'default_gateway' => 'Stripe',
                 'default_currency' => Currency::USD,
