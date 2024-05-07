@@ -94,4 +94,10 @@ class PaymentsConfig
     {
         return true;
     }
+
+    public function isRevenueCatEnabled(): bool
+    {
+        return $this->config['drivers']['revenuecat']['enabled'] ?? false;
+    }
+
 }

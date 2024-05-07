@@ -4,6 +4,7 @@ namespace EscolaLms\Payments\Tests\Api;
 
 use EscolaLms\Payments\Facades\Payments;
 use EscolaLms\Payments\Gateway\Drivers\Przelewy24Driver;
+use EscolaLms\Payments\Gateway\Drivers\RevenueCatDriver;
 use EscolaLms\Payments\Gateway\Drivers\StripeDriver;
 use EscolaLms\Payments\Tests\TestCase;
 use EscolaLms\Payments\Tests\Traits\CreatesBillable;
@@ -30,6 +31,10 @@ class PaymentGatewayTest extends TestCase
                 'przelewy24' => [
                     'enabled' => Payments::getPaymentsConfig()->isPrzelewy24Enabled(),
                     'parameters' => Przelewy24Driver::requiredParameters()
+                ],
+                'revenuecat' => [
+                    'enabled' => Payments::getPaymentsConfig()->isRevenueCatEnabled(),
+                    'parameters' => RevenueCatDriver::requiredParameters()
                 ]
             ]
         ]);

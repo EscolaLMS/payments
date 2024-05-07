@@ -46,4 +46,9 @@ abstract class AbstractDriver implements GatewayDriverContract
     {
         return array_filter($this->getRequiredParameters(), fn (string $required) => !array_key_exists($required, $parameters));
     }
+
+    public function ableToRenew(): bool
+    {
+        return false;
+    }
 }

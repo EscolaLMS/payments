@@ -27,6 +27,8 @@ class SettingsServiceProvider extends ServiceProvider
             AdministrableConfig::registerConfig('escolalms_payments.drivers.przelewy24.api_key', ['required', 'string'], false);
             AdministrableConfig::registerConfig('escolalms_payments.drivers.przelewy24.crc', ['required', 'string'], false);
 
+            AdministrableConfig::registerConfig('escolalms_payments.drivers.revenuecat.enabled', ['required', 'boolean']);
+
             AdministrableConfig::registerConfig('escolalms_payments.default_gateway', ['required', 'string', 'in:Free,Stripe,Przelewy24']);
             AdministrableConfig::registerConfig('escolalms_payments.default_currency', ['required', 'string', 'in:' . implode(',', Currency::getValues())]);
         }

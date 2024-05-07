@@ -7,8 +7,8 @@ return [
     'default_gateway' => env('PAYMENTS_DEFAULT_GATEWAY', 'Stripe'),
     'default_currency' => env('PAYMENTS_DEFAULT_CURRENCY', EscolaLms\Payments\Enums\Currency::USD),
 
-    /** 
-     * Driver specific settings 
+    /**
+     * Driver specific settings
      */
     'drivers' => [
         'free' => [],
@@ -25,6 +25,9 @@ return [
             'pos_id' => env('PAYMENTS_PRZELEWY24_POS_ID'),
             'api_key' => env('PAYMENTS_PRZELEWY24_API_KEY'),
             'crc' => env('PAYMENTS_PRZELEWY24_CRC'),
+        ],
+        'revenuecat' => [
+            'enabled' => true,
         ],
     ]
 ];
